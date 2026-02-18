@@ -1,75 +1,35 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: winter, dark, light, cupcake, forest, synthwave, corporate, dracula, night, retro, cyberpunk, valentine, halloween, garden, lofi, pastel, fantasy, wireframe, black, luxury, emerald;
-};
-
-/* Optional: If you want to force specific themes or behavior */
-@custom-variant dark (&:where([data-theme="light"], [data-theme="light"] *));
-/* :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  themes:
+    winter, dark, light, cupcake, forest, synthwave, corporate, dracula, night,
+    retro, cyberpunk, valentine, halloween, garden, lofi, pastel, fantasy,
+    wireframe, black, luxury, emerald;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+  @apply font-sans;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+*::selection {
+  color: #0197f6;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+@layer base {
+  :root {
+    --color-primary: #0197f6;
+    --color-primary-focus: #0197f6;
+    --color-primary-content: #ffffff;
+    --color-secondary: #0692d9;
+    --color-secondary-focus: #0692d9;
+    --color-secondary-content: #ffffff;
+    --color-accent: #0ed8e3;
+    --color-accent-focus: #0ed8e3;
+    --color-accent-content: #ffffff;
+  }
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
 }
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-} */
