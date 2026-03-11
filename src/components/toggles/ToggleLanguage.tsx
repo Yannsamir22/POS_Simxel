@@ -11,7 +11,7 @@ const ToggleLanguage = () => {
         className="btn btn-sm btn-ghost gap-2 hover:bg-base-200"
         title={`Switch to ${language === 'en' ? 'Français' : 'English'}`}
       >
-        <Globe size={18} />
+        <Globe size={15} />
         <span className="font-semibold">{language.toUpperCase()}</span>
       </button>
     </div>

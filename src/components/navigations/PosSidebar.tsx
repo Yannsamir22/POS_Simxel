@@ -25,12 +25,11 @@ const PosSidebar: React.FC<SidebarProps> = ({
     { name: "Settings", icon: Settings },
   ];
   return (
-    <aside className="max-h-screen w-20 flex flex-col bg-base-100 border border-base-300 shrink-0 justify-center mt-[20vh] rounded-2xl">
-      <nav className="flex-1 px-3 py-6 space-y-2 flex-col flex items-center justify-center">
+    <aside className="max-h-screen w-20 flex flex-col bg-base-100 border border-base-300 shrink-0 justify-center mt-[20vh] rounded-2xl fixed">
+      <nav className="flex-1 px-1 py-6 space-y-5 flex-col flex items-center justify-center">
         {menu.map(({ name, icon: Icon }) => (
-          <button className={`flex flex-col items-center rounded-md p-1`}>
+          <button className={`flex items-center rounded-md p-1 hover:text-accent hover:scale-125`}>
             <Icon size={20} />
-            <span className=" hover:block invisible">{name}</span>
           </button>
         ))}
       </nav>

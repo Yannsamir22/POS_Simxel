@@ -24,12 +24,12 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const menu = [
     { name: "Dashboard", icon: LayoutDashboard },
-    {name: "Reports", icon: Sheet},
-    { name: "Package", icon: Package },
+    { name: "Reports", icon: Sheet },
+    { name: "Packages", icon: Package },
     { name: "Services", icon: HeartHandshake },
-    { name: "Produits", icon: ShoppingBag },
-    { name: "Dépenses", icon: Receipt },
-    { name: "Employés", icon: Users },
+    { name: "Products", icon: ShoppingBag },
+    { name: "Expenses", icon: Receipt },
+    { name: "Employees", icon: Users },
     { name: "Settings", icon: Settings },
   ];
 
@@ -50,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 : "hover:border-2 hover:border-primary hover:bg-base-200 hover:text-primary text-base-content/70"
             }`}
           >
-            <Icon size={20}  />
+            <Icon size={20} />
             <span className="font-medium">{name}</span>
           </button>
         ))}

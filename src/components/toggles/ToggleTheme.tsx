@@ -6,7 +6,7 @@ type Theme = "light" | "black" | "dark" | "system";
 const themes: { label: string; value: Theme; icon: any }[] = [
   { label: "System", value: "system", icon: Monitor },
   { label: "Light", value: "light", icon: Sun },
-  { label: "Black", value: "black", icon: Moon },
+  { label: "Dark", value: "dark", icon: Moon },
 ];
 
 const ToggleTheme = () => {
@@ -21,7 +21,7 @@ const ToggleTheme = () => {
       const prefersDark = window.matchMedia(
         "(prefers-color-scheme: dark)",
       ).matches;
-      appliedTheme = prefersDark ? "black" : "light";
+      appliedTheme = prefersDark ? "dark" : "light";
     }
 
     document.documentElement.setAttribute("data-theme", appliedTheme);
@@ -36,10 +36,10 @@ const ToggleTheme = () => {
       >
         <input
           type="checkbox"
-          checked={theme === "black"}
+          defaultChecked={theme === "dark"}
         />
-        <Sun size={20} />
-        <Moon size={20} />
+        <Sun size={15} />
+        <Moon size={15} />
       </label>
 
       <ul
