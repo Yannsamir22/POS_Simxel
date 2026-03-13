@@ -8,7 +8,7 @@ import PackManagement from "../components/Management/PackManagement";
 import ProductManagement from "../components/Management/ProductManagement";
 import ServiceManagement from "../components/Management/ServiceManagement";
 
-const AdminPage = () => {
+const AdminPage = ({onLogout}) => {
   const [activeTab, setActiveTab] = useState("Dashboard");
   // Function to render the component corresponding to the screen
   const renderContent = () => {

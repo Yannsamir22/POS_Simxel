@@ -5,9 +5,13 @@ import {
   Trash2,
   User,
 } from "lucide-react";
+import { useTicketStore } from "../../stores/useTicketStore";
 
 const TicketSidebar = () => {
-  return (
+
+  const { currentTicket, removeItem, clearTicket, parkTicket, confirmTicket } = useTicketStore();
+
+return (
     <aside className="fixed inset-y-0 right-0 w-full sm:w-1/3 bg-base-100 border-l border-base-300 flex flex-col shadow-2xl mt-16">
       {/* HEADER : Navigation & Total Rapide */}
       <div className="p-4 bg-base-200 border-b border-base-300">
@@ -30,7 +34,7 @@ const TicketSidebar = () => {
         <div className="flex justify-between items-center bg-base-100 p-2 rounded-xl border border-base-300 shadow-inner">
           <span className="text-xs font-bold opacity-50 uppercase">Total</span>
           <span className="text-xl font-black text-primary">
-            20 000 <span className="text-xs">FCFA</span>
+            {currentTicket.total.toLocaleString()} <span className="text-xs">FCFA</span>
           </span>
         </div>
       </div>
@@ -38,23 +42,38 @@ const TicketSidebar = () => {
       {/* BODY : Liste des Services (Zone défilable) */}
       <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
         {/* Exemple d'item Service avec employé */}
-        <div className="group flex flex-col p-3 rounded-2xl bg-base-200 border border-base-300/50 hover:border-primary/30 transition-all">
-          <div className="flex justify-between items-start mb-2">
-            <span className="font-bold text-sm">Service 1</span>
-            <span className="font-mono font-bold">5 000 FCFA</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/10 rounded-lg">
-              <User size={12} className="text-primary" />
-              <span className="text-[10px] font-bold text-primary uppercase">
-                Jean E.
-              </span>
-            </div>
-            <button className="p-1 text-error opacity-0 group-hover:opacity-100 transition-opacity">
-              <Trash2 size={14} />
-            </button>
-          </div>
+        {currentTicket.items.map((item) => (
+  <div
+    key={item.id}
+    className="group flex flex-col p-3 rounded-2xl bg-base-200 border border-base-300/50 hover:border-primary/30 transition-all"
+  >
+    <div className="flex justify-between items-start mb-2">
+      <span className="font-bold text-sm">{item.name}</span>
+      <span className="font-mono font-bold">
+        {item.price.toLocaleString()} FCFA
+      </span>
+    </div>
+
+    <div className="flex justify-between items-center">
+      {item.employee && (
+        <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/10 rounded-lg">
+          <User size={12} className="text-primary" />
+          <span className="text-[10px] font-bold text-primary uppercase">
+            {item.employee}
+          </span>
         </div>
+      )}
+
+      <button
+        onClick={() => removeItem(item.id)}
+        className="p-1 text-error opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <Trash2 size={14} />
+      </button>
+    </div>
+  </div>
+))}
+
       </div>
 
       {/* FOOTER : Payment Repartition */}
@@ -83,10 +102,14 @@ const TicketSidebar = () => {
 
         {/* BOUTONS D'ACTION */}
         <div className="grid grid-cols-2 gap-3">
-          <button className="btn btn-ghost btn-md rounded-md uppercase font-bold text-error border border-error/20 hover:bg-error/10">
+          <button 
+            onClick={() => clearTicket}
+          className="btn btn-ghost btn-md rounded-md uppercase font-bold text-error border border-error/20 hover:bg-error/10">
             Cancel
           </button>
-          <button className="btn btn-primary rounded-md uppercase font-bold shadow-lg shadow-primary/30">
+          <button
+            onClick={confirmTicket}
+          className="btn btn-primary rounded-md uppercase font-bold shadow-lg shadow-primary/30">
             Confirm
           </button>
         </div>
