@@ -2,11 +2,10 @@
 import { useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navbar from "./components/navigations/Navbar";
-import Sidebar from "./components/navigations/Sidebar";
-import ChooseProduct from "./components/POS/ChooseProduct";
-import POSLogin from "./pages/POSLogin";
-import POSAdminLogin from "./pages/POSAdminLogin";
 import AdminPage from "./pages/AdminPAge";
+import POSAdminLogin from "./pages/POSAdminLogin";
+import POSLogin from "./pages/POSLogin";
+import POSPage from "./pages/POSPage";
 
 const navItems = [
   { name: "Services", href: "/service-sale" },
@@ -29,10 +28,9 @@ function App() {
   return (
     <div className="min-h-screen bg-base-100 font-sans text-base-content">
       <Router>
-        <Navbar />
         <Routes>
           <Route path="/login" element={<POSLogin />} />
-          <Route path="/" element={<ChooseProduct />} />
+          <Route path="/" element={<POSPage />} />
           <Route path="/admin/login" element={<POSAdminLogin/>} />
           <Route path="/admin" element={<AdminPage/>}/>
         </Routes>

@@ -5,9 +5,9 @@ import type { Ticket } from "../stores/useTicketStore";
 // Sales logic
 export const SalesService = {
 
-      createSale: async (ticket: Ticket) => {
+      createSale: async (payload: { items: { id: string; type: string; quantity: number; employeeId?: string }[]; payments: { method: string; amount: number }[] }) => {
             try{
-                  const res = await axiosInstance.post("/sales", ticket);
+                  const res = await axiosInstance.post("/sales", payload);
                   console.log(res)
                   return res.data
             } catch(error: any) {

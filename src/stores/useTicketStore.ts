@@ -1,34 +1,54 @@
 import { create } from "zustand";
 import { SalesService } from "../services/salesService";
 
-type TicketItem = {
+export type TicketItemType = "PRODUCT" | "SERVICE" | "PACKAGE";
+
+export interface TicketItem {
   id: string;
   name: string;
   price: number;
-  quantity?: number;
-  employee?: string;
-};
+  type: TicketItemType;
+  quantity: number;
+  employeeId?: string;
+}
+
+export interface PaymentInput {
+  method: "CASH" | "OM" | "MOMO" | "CARD";
+  amount: number;
+}
 
 export type Ticket = {
+  id: string;
   items: TicketItem[];
+  payments: PaymentInput[];
+  createdAt: number;
   total: number;
 };
 
-type TicketStore = {
+type TicketState = {
   currentTicket: Ticket;
   pendingTickets: Ticket[];
 
   addItem: (item: TicketItem) => void;
   removeItem: (id: string) => void;
+  updateQty: (id: string, qty: number) => void;
+
   clearTicket: () => void;
+
   parkTicket: () => void;
   loadTicket: (index: number) => void;
+
+  addPayment: (payment: PaymentInput) => void;
+
   confirmTicket: () => Promise<void>;
 };
 
-export const useTicketStore = create<TicketStore>((set, get) => ({
+export const useTicketStore = create<TicketState>((set, get) => ({
   currentTicket: {
+    id: crypto.randomUUID(),
     items: [],
+    payments: [],
+    createdAt: Date.now(),
     total: 0,
   },
 
@@ -36,35 +56,76 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
 
   addItem: (item) =>
     set((state) => {
-      const items = [...state.currentTicket.items, item];
+      const existing = state.currentTicket.items.find((i) => i.id === item.id);
 
-      const total = items.reduce((sum, i) => sum + i.price, 0);
+      let items;
+
+      if (existing) {
+        items = state.currentTicket.items.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        );
+      } else {
+        items = [...state.currentTicket.items, { ...item, quantity: 1 }];
+      }
+
+      const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
       return {
-        currentTicket: { items, total },
+        currentTicket: { ...state.currentTicket, items, total },
       };
     }),
 
   removeItem: (id) =>
     set((state) => {
       const items = state.currentTicket.items.filter((i) => i.id !== id);
-
-      const total = items.reduce((sum, i) => sum + i.price, 0);
+      const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
       return {
-        currentTicket: { items, total },
+        currentTicket: {
+          ...state.currentTicket,
+          items,
+          total,
+        },
+      };
+    }),
+
+  updateQty: (id, qty) =>
+    set((state) => {
+      const items = state.currentTicket.items.map((i) =>
+        i.id === id ? { ...i, quantity: qty } : i
+      );
+      const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+      return {
+        currentTicket: {
+          ...state.currentTicket,
+          items,
+          total,
+        },
       };
     }),
 
   clearTicket: () =>
     set({
-      currentTicket: { items: [], total: 0 },
+      currentTicket: {
+        id: crypto.randomUUID(),
+        items: [],
+        payments: [],
+        createdAt: Date.now(),
+        total: 0,
+      },
     }),
 
   parkTicket: () =>
     set((state) => ({
       pendingTickets: [...state.pendingTickets, state.currentTicket],
-      currentTicket: { items: [], total: 0 },
+      currentTicket: {
+        id: crypto.randomUUID(),
+        items: [],
+        payments: [],
+        createdAt: Date.now(),
+        total: 0,
+      },
     })),
 
   loadTicket: (index) =>
@@ -78,18 +139,47 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
         currentTicket: ticket,
         pendingTickets: pending,
       };
+    }),
 
-}),
-confirmTicket: async() => {
-      const ticket = get().currentTicket;
-      if(ticket.items.length == 0) return;
-      
-      try {
-            await SalesService.createSale(ticket);
-            set({currentTicket: {items: [], total: 0}}); // clear after sale
-            console.log("Sale Confirmed!");
-      } catch (error) {
-            console.error("Failed to confirm sale: ", error)
-      }
-}
+  addPayment: (payment) =>
+    set((state) => ({
+      currentTicket: {
+        ...state.currentTicket,
+        payments: [...state.currentTicket.payments, payment],
+      },
+    })),
+
+  confirmTicket: async () => {
+    const ticket = get().currentTicket;
+
+    if (ticket.items.length === 0) return;
+
+    try {
+      const payload = {
+        items: ticket.items.map((item) => ({
+          id: item.id,
+          type: item.type,
+          quantity: item.quantity,
+          employeeId: item.employeeId,
+        })),
+        payments: ticket.payments,
+      };
+
+      await SalesService.createSale(payload);
+
+      set({
+        currentTicket: {
+          id: crypto.randomUUID(),
+          items: [],
+          payments: [],
+          createdAt: Date.now(),
+          total: 0
+        },
+      });
+
+      console.log("Sale Confirmed!");
+    } catch (error) {
+      console.error("Failed to confirm sale:", error);
+    }
+  },
 }));

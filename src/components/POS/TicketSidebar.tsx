@@ -5,11 +5,19 @@ import {
   Trash2,
   User,
 } from "lucide-react";
+import { useState } from "react";
 import { useTicketStore } from "../../stores/useTicketStore";
 
 const TicketSidebar = () => {
 
-  const { currentTicket, removeItem, clearTicket, parkTicket, confirmTicket } = useTicketStore();
+  const { currentTicket, removeItem, clearTicket, parkTicket, confirmTicket, addPayment } = useTicketStore();
+
+  const [paymentAmounts, setPaymentAmounts] = useState<{ [key: string]: number }>({
+    CASH: 0,
+    OM: 0,
+    MOMO: 0,
+    CARD: 0,
+  });
 
 return (
     <aside className="fixed inset-y-0 right-0 w-full sm:w-1/3 bg-base-100 border-l border-base-300 flex flex-col shadow-2xl mt-16">
@@ -26,7 +34,7 @@ return (
             <button className="btn btn-xs btn-circle btn-ghost">
               <ChevronRight size={14} />
             </button>
-            <button className="btn btn-xs btn-circle btn-ghost text-primary">
+            <button onClick={clearTicket} className="btn btn-xs btn-circle btn-ghost text-primary">
               <PlusSquare size={14} />
             </button>
           </div>
@@ -49,17 +57,20 @@ return (
   >
     <div className="flex justify-between items-start mb-2">
       <span className="font-bold text-sm">{item.name}</span>
-      <span className="font-mono font-bold">
-        {item.price.toLocaleString()} FCFA
-      </span>
+      <div className="text-right">
+        <span className="font-mono font-bold">
+          {item.price.toLocaleString()} FCFA
+        </span>
+        <div className="text-xs opacity-70">Qty: {item.quantity}</div>
+      </div>
     </div>
 
     <div className="flex justify-between items-center">
-      {item.employee && (
+       {item.employeeId && (
         <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/10 rounded-lg">
           <User size={12} className="text-primary" />
           <span className="text-[10px] font-bold text-primary uppercase">
-            {item.employee}
+            {item.employeeId}
           </span>
         </div>
       )}
@@ -83,18 +94,29 @@ return (
         </h3>
 
         <div className="grid grid-cols-2 gap-1 mb-2">
-          {["Cash", "OM", "MoMo", "Card"].map((method) => (
+          {[
+            { label: "Cash", method: "CASH" },
+            { label: "OM", method: "OM" },
+            { label: "MoMo", method: "MOMO" },
+            { label: "Card", method: "CARD" },
+          ].map(({ label, method }) => (
             <label
               key={method}
               className="flex items-center justify-between p-3 rounded-md border border-base-300 bg-base-100 hover:border-primary cursor-pointer transition-all group"
             >
               <span className="text-xs font-bold opacity-70 mr-2 group-hover:opacity-100">
-                {method}
+                {label}
               </span>
               <input
-                type=""
-                name="payment"
+                type="number"
+                value={paymentAmounts[method] || ""}
+                onChange={(e) => {
+                  const amount = parseFloat(e.target.value) || 0;
+                  setPaymentAmounts((prev) => ({ ...prev, [method]: amount }));
+                  // Optionally add to store immediately, but for now, on confirm
+                }}
                 className="input input-xs input-ghost text-lg"
+                placeholder="0"
               />
             </label>
           ))}
@@ -103,13 +125,22 @@ return (
         {/* BOUTONS D'ACTION */}
         <div className="grid grid-cols-2 gap-3">
           <button 
-            onClick={() => clearTicket}
+            onClick={() => {
+              clearTicket();
+              setPaymentAmounts({ CASH: 0, OM: 0, MOMO: 0, CARD: 0 });
+            }}
           className="btn btn-ghost btn-md rounded-md uppercase font-bold text-error border border-error/20 hover:bg-error/10">
             Cancel
           </button>
           <button
-            onClick={confirmTicket}
-          className="btn btn-primary rounded-md uppercase font-bold shadow-lg shadow-primary/30">
+            onClick={() => {
+              Object.entries(paymentAmounts).forEach(([method, amount]) => {
+                if (amount > 0) addPayment({ method: method as "CASH" | "OM" | "MOMO" | "CARD", amount });
+              });
+              confirmTicket();
+            }}
+            className="btn btn-primary rounded-md uppercase font-bold shadow-lg shadow-primary/30"
+          >
             Confirm
           </button>
         </div>
