@@ -8,9 +8,13 @@ import PackManagement from "../components/Management/PackManagement";
 import ProductManagement from "../components/Management/ProductManagement";
 import ServiceManagement from "../components/Management/ServiceManagement";
 
-const AdminPage = ({onLogout}) => {
+interface AdminPageProps {
+  onLogout: () => void;
+}
+
+const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState("Dashboard");
-  // Function to render the component corresponding to the screen
+
   const renderContent = () => {
     switch (activeTab) {
       case "Employees":
@@ -29,12 +33,21 @@ const AdminPage = ({onLogout}) => {
         return <Dashboard />;
     }
   };
-  return (
-    <div className="flex h-screen bg-base-200 overflow-y-scroll">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="flex-1 overflow-y-auto p-8 relative">
-        {/* Simple Animation */}
+  return (
+    <div className="h-screen bg-base-200 overflow-hidden">
+      
+      {/* Fixed Sidebar */}
+      <div className="fixed left-0 top-0 h-screen w-72">
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onLogout={onLogout}
+        />
+      </div>
+
+      {/* Main Content */}
+      <main className="ml-72 h-screen overflow-y-auto p-8">
         <div
           key={activeTab}
           className="animate-in fade-in slide-in-from-bottom-2 duration-300 h-full"

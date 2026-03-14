@@ -28,6 +28,7 @@ export type Ticket = {
 type TicketState = {
   currentTicket: Ticket;
   pendingTickets: Ticket[];
+  selectedPendingIndex: number | null;
 
   addItem: (item: TicketItem) => void;
   removeItem: (id: string) => void;
@@ -37,6 +38,8 @@ type TicketState = {
 
   parkTicket: () => void;
   loadTicket: (index: number) => void;
+  selectPendingTicket: (index: number) => void;
+  removePendingTicket: (index: number) => void;
 
   addPayment: (payment: PaymentInput) => void;
 
@@ -53,6 +56,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   },
 
   pendingTickets: [],
+  selectedPendingIndex: null,
 
   addItem: (item) =>
     set((state) => {
@@ -62,7 +66,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
 
       if (existing) {
         items = state.currentTicket.items.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
         );
       } else {
         items = [...state.currentTicket.items, { ...item, quantity: 1 }];
@@ -92,7 +96,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   updateQty: (id, qty) =>
     set((state) => {
       const items = state.currentTicket.items.map((i) =>
-        i.id === id ? { ...i, quantity: qty } : i
+        i.id === id ? { ...i, quantity: qty } : i,
       );
       const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
@@ -117,16 +121,20 @@ export const useTicketStore = create<TicketState>((set, get) => ({
     }),
 
   parkTicket: () =>
-    set((state) => ({
-      pendingTickets: [...state.pendingTickets, state.currentTicket],
-      currentTicket: {
-        id: crypto.randomUUID(),
-        items: [],
-        payments: [],
-        createdAt: Date.now(),
-        total: 0,
-      },
-    })),
+    set((state) => {
+      const newTicket = { ...state.currentTicket };
+      return {
+        pendingTickets: [...state.pendingTickets, newTicket],
+        selectedPendingIndex: state.pendingTickets.length,
+        currentTicket: {
+          id: crypto.randomUUID(),
+          items: [],
+          payments: [],
+          createdAt: Date.now(),
+          total: 0,
+        },
+      };
+    }),
 
   loadTicket: (index) =>
     set((state) => {
@@ -138,7 +146,16 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       return {
         currentTicket: ticket,
         pendingTickets: pending,
+        selectedPendingIndex: null,
       };
+    }),
+
+  selectPendingTicket: (index) => set({ selectedPendingIndex: index }),
+  removePendingTicket: (index) =>
+    set((state) => {
+      const pending = [...state.pendingTickets];
+      pending.splice(index, 1);
+      return { pendingTickets: pending, selectedPendingIndex: null };
     }),
 
   addPayment: (payment) =>
@@ -173,7 +190,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
           items: [],
           payments: [],
           createdAt: Date.now(),
-          total: 0
+          total: 0,
         },
       });
 

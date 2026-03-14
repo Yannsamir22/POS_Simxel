@@ -1,12 +1,14 @@
 import { ChevronRight, LogOut, Menu, User, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../stores/authStore";
 import ToggleLanguage from "../toggles/ToggleLanguage";
 import ToggleTheme from "../toggles/ToggleTheme";
-import { useNavigate, useNavigation } from "react-router-dom";
 
 const Navbar: React.FC = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [isOpen, setIsOpen] = useState(false);
-  const Navigate = useNavigate()
+  const Navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen) {
@@ -31,13 +33,17 @@ const Navbar: React.FC = () => {
 
         {/* DESKTOP MENU */}
         <div className="hidden md:flex items-center gap-4">
-          <button className="btn btn-ghost flex items-center gap-2 hover:bg-error/20 hover:text-error transition-all">
-            <span className="text-sm">LogOut</span>
-            <LogOut size={18} />
-          </button>
-          <button 
+          {isAuthenticated && (
+            <button className="btn btn-ghost flex items-center gap-2 hover:bg-error/20 hover:text-error transition-all">
+              <span className="text-sm">LogOut</span>
+              <LogOut size={18} />
+            </button>
+          )}
+
+          <button
             onClick={() => Navigate("/admin/login")}
-            className="btn btn-ghost flex items-center gap-2 font-bold">
+            className="btn btn-ghost flex items-center gap-2 font-bold"
+          >
             <span className="text-sm">Admin</span>
             <User size={15} />
           </button>
@@ -99,7 +105,6 @@ const Navbar: React.FC = () => {
                 </button>
               </nav>
               <div className="mt-auto pt-6 border-t border-base-200 bg-base-100">
-                
                 <div className="flex items-center justify-between px-2">
                   <span className="text-sm font-medium">Language</span>
                   <ToggleLanguage />

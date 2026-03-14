@@ -1,15 +1,26 @@
 import { useState } from "react";
+import { useAuthStore } from "../stores/authStore";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/navigations/Navbar";
 
-const POSLogin = ({ onLogin }) => {
+const POSLogin = () => {
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
-  //   const navigate = useNavigate();
+  const navigate = useNavigate();
+  const loginAsManager = useAuthStore((state) => state.loginAsManager);
+  const checkAuth = useAuthStore((state) => state.checkAuth);
 
-  const handleSubmit = async (e: any) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const ok = await onLogin(pin);
-    if (ok && ok.success) {
-      // navigate("/");
+    setError(false);
+    
+    const res = await loginAsManager({ password: pin });
+
+    if (res.success) {
+      await checkAuth();
+      console.log("Login successful");
+      navigate("/");
     } else {
       setError(true);
       setPin("");
@@ -17,12 +28,14 @@ const POSLogin = ({ onLogin }) => {
   };
   const msg = "Welcome to Simxel";
   return (
-    <div className="h-screen onerflow-hidden flex w-full">
-      <div className="flex justify-between pb-10 w-full">
+    <div className="h-screen overflow-hidden flex flex-col w-full">
+      <Navbar />
+      
+      <div className="flex justify-center pb-10 w-full">
         <div className="rounded-md shadow-xl w-full h-[calc(110vh-8rem)]">
           <div className="flex flex-col h-full overflow-hidden w-full items-center justify-center p-5 font-sans">
             <h1
-              className={`text-5xl font-extrabold ${msg.charAt(11) ? "text-primary" : msg[12] ? "text-accent" : ""}`}
+              className={`text-5xl font-extrabold text-primary `}
             >
               {msg}
             </h1>
@@ -57,7 +70,7 @@ const POSLogin = ({ onLogin }) => {
                 </div>
                 {error && (
                   <p className="text-error font-bold text-sm ml-2">
-                    Code incorrect
+                    Password incorrect
                   </p>
                 )}
               </form>

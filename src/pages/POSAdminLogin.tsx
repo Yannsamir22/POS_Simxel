@@ -1,17 +1,19 @@
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
+import Navbar from "../components/navigations/Navbar";
 
-const POSAdminLogin = ({ onLogin }) => {
+const POSAdminLogin = () => {
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e:any) => {
+  const loginAsAdmin = useAuthStore((state) => state.loginAsAdmin);
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const ok = await onLogin;
-    if (ok && ok.success) {
-      navigate("/admin");
-    } else if (pin === "1234") {
+    const res = await loginAsAdmin({ password: pin });
+    if (res.success) {
       navigate("/admin");
     } else {
       setError(true);
@@ -19,7 +21,15 @@ const POSAdminLogin = ({ onLogin }) => {
     }
   };
   return (
-    <div className="h-screen overflow-hidden flex w-full relative">
+    <div className="h-screen overflow-hidden flex flex-col w-full relative">
+        <Navbar />
+      <button
+        type="button"
+        onClick={() => navigate("/login")}
+        className="absolute top-20 left-6 btn btn-outline rounded-full flex items-center size-12"
+      >
+        <ArrowLeft />
+      </button>
       <div className="flex justify-between pb-10 w-full">
         <div className="rounded-md shadow-cl w-full h-[calc(110vh-8rem)]">
           <div className="flex h-full overflow-hidden w-full items-center justify-center">
@@ -50,7 +60,10 @@ const POSAdminLogin = ({ onLogin }) => {
                   </div>
                   <div className="relative w-1/3">
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary" />
-                    <button type="submit" className="btn w-full font-semibold active:outline-none">
+                    <button
+                      type="submit"
+                      className="btn w-full font-semibold active:outline-none"
+                    >
                       Unlock
                     </button>
                   </div>
