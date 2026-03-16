@@ -34,6 +34,10 @@ export interface AuthActions {
     oldPass: string,
     newPass: string
   ) => Promise<{ success: boolean; error?: string }>;
+   changeManagerPassword: (
+    oldPass: string,
+    newPass: string
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
 export type AuthStore = AuthState & AuthActions;

@@ -10,6 +10,14 @@ export interface TicketItem {
   type: TicketItemType;
   quantity: number;
   employeeId?: string;
+  services?: PackageService[];
+}
+
+export interface PackageService {
+  serviceId: string;
+  name: string;
+  price: number;
+  employeeId?: string;
 }
 
 export interface PaymentInput {
@@ -44,6 +52,13 @@ type TicketState = {
   addPayment: (payment: PaymentInput) => void;
 
   confirmTicket: () => Promise<void>;
+
+  assignEmployee: (itemId: string, employeeId: string) => void;
+  assignPackageEmployee: (
+    itemId: string,
+    serviceId: string,
+    employeeId: string,
+  ) => void;
 };
 
 export const useTicketStore = create<TicketState>((set, get) => ({
@@ -59,25 +74,28 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   selectedPendingIndex: null,
 
   addItem: (item) =>
-    set((state) => {
-      const existing = state.currentTicket.items.find((i) => i.id === item.id);
+  set((state) => {
+    const existing = state.currentTicket.items.find((i) => i.id === item.id);
+    let newItems;
 
-      let items;
+    if (existing && item.type === "PRODUCT") {
+      newItems = state.currentTicket.items.map((i) =>
+        i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+      );
+    } else {
+      newItems = [...state.currentTicket.items, item];
+    }
 
-      if (existing) {
-        items = state.currentTicket.items.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
-        );
-      } else {
-        items = [...state.currentTicket.items, { ...item, quantity: 1 }];
-      }
+    const newTotal = newItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-      const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-
-      return {
-        currentTicket: { ...state.currentTicket, items, total },
-      };
-    }),
+    return {
+      currentTicket: {
+        ...state.currentTicket,
+        items: newItems,
+        total: newTotal,
+      },
+    };
+  }),
 
   removeItem: (id) =>
     set((state) => {
@@ -178,9 +196,12 @@ export const useTicketStore = create<TicketState>((set, get) => ({
           type: item.type,
           quantity: item.quantity,
           employeeId: item.employeeId,
+          services: item.services, // Include sub-services for packages
         })),
         payments: ticket.payments,
       };
+
+      console.debug("[TicketStore] confirmTicket payload:", payload);
 
       await SalesService.createSale(payload);
 
@@ -199,4 +220,31 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       console.error("Failed to confirm sale:", error);
     }
   },
+
+  assignEmployee: (itemId, employeeId) =>
+    set((state) => {
+      const updatedItems = state.currentTicket.items.map((item) =>
+        item.id === itemId ? { ...item, employeeId } : item,
+      );
+      return { currentTicket: { ...state.currentTicket, items: updatedItems } };
+    }),
+  assignPackageEmployee: (itemId, serviceId, employeeId) =>
+    set((state) => {
+      const updatedItems = state.currentTicket.items.map((item) => {
+        if (item.id !== itemId) return item;
+
+        if (!item.services) return item;
+
+        const updatedServices = item.services.map((service) =>
+          service.serviceId === serviceId
+            ? { ...service, employeeId }
+            : service,
+        );
+        return { ...item, services: updatedServices };
+      });
+
+      return {
+        currentTicket: { ...state.currentTicket, items: updatedItems },
+      };
+    }),
 }));

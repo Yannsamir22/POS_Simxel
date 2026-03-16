@@ -4,7 +4,6 @@ import type { AuthStore } from "../types/authTypes";
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   isAuthenticated: false,
-  isConfigured: null,
   accessLevel: null,
   isAdmin: false,
   user: null,
@@ -17,39 +16,35 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const res = await authAPI.checkMe();
       const data = res?.data ?? {};
 
-      // Some backends return { ok: true, role: "ADMIN" }, others return { role: "admin" }.
-      const ok = typeof data.ok === "boolean" ? data.ok : true;
-      const role =
-        data.role ??
-        data.user?.role ??
-        // Some APIs nest payload under data.data
-        data.data?.role ??
-        null;
-
-      if (ok) {
-        const normalizedRole =
-          typeof role === "string" ? role.trim().toLowerCase() : null;
-
-        set({
-          isAuthenticated: true,
-          accessLevel: normalizedRole === "admin" ? "admin" : "manager",
-          isAdmin: normalizedRole === "admin",
-          user: role ?? null,
-          loading: false,
-        });
-      } else {
+      if (!data.ok) {
         set({
           isAuthenticated: false,
           accessLevel: null,
-          user: null,
           isAdmin: false,
+          user: null,
           loading: false,
         });
+        return;
       }
+
+      // Backend returns role as "ADMIN", 'MANAGER, 'OWNER'
+
+      const role: string = data.role ?? "";
+      const isAdmin = ["ADMIN", "admin", "Owner"].includes(role);
+
+      set({
+        isAuthenticated: true,
+        accessLevel: isAdmin ? "admin" : "manager",
+        isAdmin,
+        user: data.sub ?? null,
+        loading: false,
+      })
     } catch (error: any) {
-      // If 401, don't reset auth state if we just logged in (but since this is checkAuth, it's general)
-      // For now, log the error for debugging
-      console.error("checkAuth error:", error.response?.status, error.response?.data);
+      console.error(
+        "checkAuth error:",
+        error.response?.status,
+        error.response?.data,
+      );
       set({
         isAuthenticated: false,
         accessLevel: null,
@@ -72,12 +67,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       return {
         success: false,
-        error: res.data.error,
+        error: res.data.error ?? "Login failed",
       };
-    } catch {
+    } catch(error: any) {
       return {
         success: false,
-        error: "Login error",
+        error: error.response?.data?.error ??"Login error",
       };
     }
   },
@@ -90,8 +85,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       if (res.data.ok) {
         await get().checkAuth();
 
-        // In case the backend returns a role that isn't normalized, force admin
-        // until the next successful /auth/me check.
         set({
           isAuthenticated: true,
           accessLevel: "admin",
@@ -103,18 +96,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       return {
         success: false,
-        error: res.data.error,
+        error: res.data.error ?? "Login failed",
       };
-    } catch {
+    } catch(error: any) {
       return {
         success: false,
-        error: "Login error",
+        error: error.response?.data?.error ??"Login error",
       };
     }
   },
 
   // logout Manager
-managerLogout: async () => {
+  managerLogout: async () => {
     try {
       await authAPI.managerLogout();
     } finally {
@@ -122,7 +115,7 @@ managerLogout: async () => {
         isAuthenticated: false,
         accessLevel: null,
         user: null,
-        isAdmin: false
+        isAdmin: false,
       });
     }
   },
@@ -136,7 +129,7 @@ managerLogout: async () => {
         isAuthenticated: false,
         accessLevel: null,
         user: null,
-        isAdmin: false
+        isAdmin: false,
       });
     }
   },
@@ -157,19 +150,40 @@ managerLogout: async () => {
 
       return {
         success: false,
-        error:
-          res.data.error ||
-          "Error while changing password"
+        error: res.data.error || "Error while changing password",
       };
     } catch (err: any) {
       return {
         success: false,
-        error:
-          err.response?.data?.error ||
-          "Error while changing password"
+        error: err.response?.data?.error || "Error while changing password",
       };
     } finally {
       set({ loading: false });
     }
-}
+  },
+
+
+    changeManagerPassword: async (oldPass, newPass) => {
+    set({ loading: true });
+
+    try {
+      const res = await authAPI.changeManagerPassword(oldPass, newPass);
+
+      if (res.data.ok) {
+        return { success: true };
+      }
+
+      return {
+        success: false,
+        error: res.data.error || "Error while changing password",
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err.response?.data?.error || "Error while changing password",
+      };
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));

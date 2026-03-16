@@ -1,7 +1,13 @@
 import { Edit2, Plus, Trash2 } from "lucide-react";
+import { useEffect } from "react";
+import { useEmployeeStore } from "../../stores/employeeStore";
 
 const EmployeeManagement = () => {
-  const loading = false;
+  const { loading, employees, loadEmployees } = useEmployeeStore();
+
+  useEffect(() => {
+    loadEmployees();
+  }, []);
   if (loading)
     return (
       <div className="h-full w-full flex flex-col items-center justify-center  bg-base-100">
@@ -39,16 +45,16 @@ const EmployeeManagement = () => {
                   Employee
                 </th>
                 <th className="text-right text-[10px] uppercase tracking-widest opacity-50 pr-6">
+                  Commission
+                </th>
+                <th className="text-right text-[10px] uppercase tracking-widest opacity-50 pr-6">
                   Actions
                 </th>
               </tr>
             </thead>
 
             <tbody>
-              {[
-                { id: 1, name: "yann" },
-                { id: 2, name: "samir" },
-              ].map((emp) => (
+              {employees.map((emp) => (
                 <tr
                   key={emp.id}
                   className="hover:bg-base-300/30 border-b border-base-300/50 group"
@@ -58,10 +64,24 @@ const EmployeeManagement = () => {
                       <span className="font-bold text-sm uppercase tracking-tight">
                         {emp.name}
                       </span>
+
                       <span className="text-[9px] opacity-40 font-bold u]ercase italic">
-                        Test
+                        {(emp.dateOfBirth &&
+                          new Date(emp.dateOfBirth).toLocaleDateString()) ||
+                          "N/A"}
                       </span>
                     </div>
+                  </td>
+                  <td className="text-right pr-6 space-x-2">
+                    {emp.commissionRate ? (
+                      <span className="font-mono font-bold text-green-500">
+                        {emp.commissionRate}%
+                      </span>
+                    ) : (
+                      <span className="font-mono font-bold text-red-500">
+                        0%
+                      </span>
+                    )}
                   </td>
                   <td className="text-right pr-6 space-x-2">
                     <button className="btn btn-ghost btn-xs rounded-4xl p-1 hover:text-primary transition-colors">

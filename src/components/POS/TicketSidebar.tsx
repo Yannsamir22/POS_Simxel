@@ -1,25 +1,26 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-  PlusSquare,
-  Trash2,
-  User,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusSquare } from "lucide-react";
 import { useState } from "react";
 import { useTicketStore } from "../../stores/useTicketStore";
+import TicketItemRenderer from "../ticket/TicketItemRenderer";
 
 const TicketSidebar = () => {
+  const {
+    currentTicket,
+    clearTicket,
+    confirmTicket,
+    addPayment,
+  } = useTicketStore();
 
-  const { currentTicket, removeItem, clearTicket, parkTicket, confirmTicket, addPayment } = useTicketStore();
-
-  const [paymentAmounts, setPaymentAmounts] = useState<{ [key: string]: number }>({
+  const [paymentAmounts, setPaymentAmounts] = useState<{
+    [key: string]: number;
+  }>({
     CASH: 0,
     OM: 0,
     MOMO: 0,
     CARD: 0,
   });
 
-return (
+  return (
     <aside className="fixed inset-y-0 right-0 w-full sm:w-1/3 bg-base-100 border-l border-base-300 flex flex-col shadow-2xl mt-16">
       {/* HEADER : Navigation & Total Rapide */}
       <div className="p-4 bg-base-200 border-b border-base-300">
@@ -34,7 +35,10 @@ return (
             <button className="btn btn-xs btn-circle btn-ghost">
               <ChevronRight size={14} />
             </button>
-            <button onClick={clearTicket} className="btn btn-xs btn-circle btn-ghost text-primary">
+            <button
+              onClick={clearTicket}
+              className="btn btn-xs btn-circle btn-ghost text-primary"
+            >
               <PlusSquare size={14} />
             </button>
           </div>
@@ -42,49 +46,19 @@ return (
         <div className="flex justify-between items-center bg-base-100 p-2 rounded-xl border border-base-300 shadow-inner">
           <span className="text-xs font-bold opacity-50 uppercase">Total</span>
           <span className="text-xl font-black text-primary">
-            {currentTicket.total.toLocaleString()} <span className="text-xs">FCFA</span>
+            {currentTicket.total.toLocaleString()}{" "}
+            <span className="text-xs">FCFA</span>
           </span>
         </div>
       </div>
 
       {/* BODY : Liste des Services (Zone défilable) */}
       <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
-        {/* Exemple d'item Service avec employé */}
         {currentTicket.items.map((item) => (
-  <div
-    key={item.id}
-    className="group flex flex-col p-3 rounded-2xl bg-base-200 border border-base-300/50 hover:border-primary/30 transition-all"
-  >
-    <div className="flex justify-between items-start mb-2">
-      <span className="font-bold text-sm">{item.name}</span>
-      <div className="text-right">
-        <span className="font-mono font-bold">
-          {item.price.toLocaleString()} FCFA
-        </span>
-        <div className="text-xs opacity-70">Qty: {item.quantity}</div>
-      </div>
-    </div>
-
-    <div className="flex justify-between items-center">
-       {item.employeeId && (
-        <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/10 rounded-lg">
-          <User size={12} className="text-primary" />
-          <span className="text-[10px] font-bold text-primary uppercase">
-            {item.employeeId}
-          </span>
-        </div>
-      )}
-
-      <button
-        onClick={() => removeItem(item.id)}
-        className="p-1 text-error opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <Trash2 size={14} />
-      </button>
-    </div>
-  </div>
-))}
-
+          <TicketItemRenderer 
+          key={item.id}
+          item={item} />
+        ))}
       </div>
 
       {/* FOOTER : Payment Repartition */}
@@ -124,18 +98,23 @@ return (
 
         {/* BOUTONS D'ACTION */}
         <div className="grid grid-cols-2 gap-3">
-          <button 
+          <button
             onClick={() => {
               clearTicket();
               setPaymentAmounts({ CASH: 0, OM: 0, MOMO: 0, CARD: 0 });
             }}
-          className="btn btn-ghost btn-md rounded-md uppercase font-bold text-error border border-error/20 hover:bg-error/10">
+            className="btn btn-ghost btn-md rounded-md uppercase font-bold text-error border border-error/20 hover:bg-error/10"
+          >
             Cancel
           </button>
           <button
             onClick={() => {
               Object.entries(paymentAmounts).forEach(([method, amount]) => {
-                if (amount > 0) addPayment({ method: method as "CASH" | "OM" | "MOMO" | "CARD", amount });
+                if (amount > 0)
+                  addPayment({
+                    method: method as "CASH" | "OM" | "MOMO" | "CARD",
+                    amount,
+                  });
               });
               confirmTicket();
             }}

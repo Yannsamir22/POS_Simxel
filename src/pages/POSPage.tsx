@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/navigations/Navbar";
 import PosSidebar from "../components/navigations/PosSidebar";
 import TicketSidebar from "../components/POS/TicketSidebar";
@@ -7,8 +7,16 @@ import PackagesTab from "../components/tabs/PackagesTab";
 import ProductsTab from "../components/tabs/ProductsTab";
 import ServicesTab from "../components/tabs/ServicesTab";
 import SettingsTab from "../components/tabs/SettingsTab";
+import { useEmployeeStore } from "../stores/employeeStore";
 
 const POSPage: React.FC = () => {
+  // Load Employees
+  const { loadEmployees } = useEmployeeStore();
+
+  useEffect(() => {
+    loadEmployees();
+  }, []);
+
   const [activeTab, setActiveTab] = useState<string>("Products");
 
   //  Function to render the tab content based on the active tab
@@ -34,19 +42,21 @@ const POSPage: React.FC = () => {
       <Navbar />
 
       <div className="flex flex-1 pt-16">
-
-      {/* Sidebar */}
-      <PosSidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={() => console.log("Logout")}/>
+        {/* Sidebar */}
+        <PosSidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onLogout={() => console.log("Logout")}
+        />
         {/* Main Content */}
         <div className="flex-1 flex">
-          <div className="flex-1 p-4 overflow-y-auto">{renderTabContent()}
-          </div>
-            {/* Ticket Sidebar */}
-            <div className="w-[380px] border-l border-base-300">
-              <TicketSidebar />
-            </div>
+          <div className="flex-1 p-4 overflow-y-auto">{renderTabContent()}</div>
+          {/* Ticket Sidebar */}
+          <div className="w-95 border-l border-base-300">
+            <TicketSidebar />
           </div>
         </div>
+      </div>
     </div>
   );
 };
