@@ -1,0 +1,227 @@
+{
+  "nav": {
+    "dashboard":  "Dashboard",
+    "reports":    "Reports",
+    "products":   "Products",
+    "services":   "Services",
+    "packages":   "Packages",
+    "expenses":   "Expenses",
+    "employees":  "Employees",
+    "settings":   "Settings",
+    "logout":     "Log out"
+  },
+
+  "common": {
+    "add":        "Add",
+    "edit":       "Edit",
+    "delete":     "Delete",
+    "save":       "Save",
+    "cancel":     "Cancel",
+    "confirm":    "Confirm",
+    "search":     "Search…",
+    "loading":    "Loading…",
+    "noData":     "No data found",
+    "error":      "An error occurred",
+    "success":    "Success",
+    "actions":    "Actions",
+    "name":       "Name",
+    "price":      "Price",
+    "amount":     "Amount",
+    "date":       "Date",
+    "note":       "Note",
+    "type":       "Type",
+    "status":     "Status",
+    "total":      "Total",
+    "currency":   "FCFA"
+  },
+
+  "auth": {
+    "welcome":        "Welcome to Simxel",
+    "readyMsg":       "Ready for a new day of service?",
+    "password":       "Enter the Password",
+    "access":         "Access",
+    "wrongPassword":  "Incorrect password",
+    "adminSpace":     "Admin Space",
+    "adminWelcome":   "Good to see you back, Boss",
+    "adminCode":      "Admin Security Code",
+    "unlock":         "Unlock",
+    "refusedAccess":  "Access Refused",
+    "logoutManager":  "Manager logged out",
+    "logoutAdmin":    "Admin logged out"
+  },
+
+  "dashboard": {
+    "title":          "Dashboard",
+    "subtitle":       "Business Performance Overview",
+    "noSales":        "No sales recorded for this period",
+    "period": {
+      "today":      "Today",
+      "yesterday":  "Yesterday",
+      "thisWeek":   "This week",
+      "thisMonth":  "This month",
+      "thisYear":   "This year"
+    },
+    "kpi": {
+      "revenue":    "Revenue",
+      "commission": "Commission",
+      "sales":      "Sales",
+      "avgCart":    "Average Cart"
+    },
+    "chart":          "Revenue",
+    "payments":       "Payment Methods",
+    "totalCollected": "Total Collected",
+    "topPerformers":  "Top Performers"
+  },
+
+  "reports": {
+    "title":          "Reports",
+    "subtitle":       "Export & Analytics",
+    "selectPeriod":   "Select a period",
+    "startDate":      "Start Date",
+    "endDate":        "End Date",
+    "generate":       "Generate",
+    "download":       "Download",
+    "downloading":    "Downloading…",
+    "noResults":      "No results for this period",
+    "summary": {
+      "title":          "Sales Summary",
+      "totalRevenue":   "Total Revenue",
+      "totalTx":        "Transactions",
+      "avgTx":          "Average Transaction",
+      "byPayment":      "By Payment Method"
+    },
+    "topItems": {
+      "title":    "Top Items",
+      "quantity": "Qty",
+      "revenue":  "Revenue"
+    },
+    "exports": {
+      "title":          "Export Reports",
+      "salesJournal":   "Sales Journal",
+      "salesJournalDesc": "Full list of transactions in Excel",
+      "staffPerf":      "Staff Performance",
+      "staffPerfDesc":  "Commission & revenue per employee",
+      "stockStatus":    "Stock Status",
+      "stockStatusDesc": "Current inventory snapshot",
+      "financial":      "Financial Balance",
+      "financialDesc":  "Revenue vs expenses summary"
+    }
+  },
+
+  "products": {
+    "title":        "Stock Inventory",
+    "subtitle":     "Product Management",
+    "addProduct":   "Add Product",
+    "name":         "Product Name",
+    "salePrice":    "Selling Price",
+    "unitCost":     "Unit Cost",
+    "stock":        "In Stock",
+    "minAlert":     "Low Stock Alert",
+    "outOfStock":   "Out of stock",
+    "lowStock":     "Low stock",
+    "inStock":      "in stock",
+    "noProducts":   "No products yet"
+  },
+
+  "services": {
+    "title":       "Service Panel",
+    "subtitle":    "Service Management",
+    "addService":  "Add Service",
+    "name":        "Service Name",
+    "price":       "Price",
+    "noServices":  "No services yet"
+  },
+
+  "packages": {
+    "title":        "Package & Offers",
+    "subtitle":     "Combined Offers Management",
+    "addPackage":   "Add Package",
+    "included":     "Included Services",
+    "noServices":   "No linked services",
+    "noPackages":   "No packages yet"
+  },
+
+  "expenses": {
+    "title":         "Expenses Journal",
+    "subtitle":      "Real-time Cash Outflow",
+    "addExpense":    "New Expense",
+    "totalExpenses": "Total Expenses",
+    "thisMonth":     "This Month",
+    "noExpenses":    "No expenses recorded",
+    "type":          "Expense Type",
+    "types": {
+      "Rent":        "Rent",
+      "Electricity": "Electricity",
+      "Water":       "Water",
+      "Supplies":    "Supplies",
+      "Salary":      "Salary",
+      "Transport":   "Transport",
+      "Maintenance": "Maintenance",
+      "Marketing":   "Marketing",
+      "Other":       "Other"
+    }
+  },
+
+  "employees": {
+    "title":        "Employees",
+    "subtitle":     "Profile Management",
+    "addEmployee":  "Add Employee",
+    "commission":   "Commission",
+    "role":         "Role",
+    "dob":          "Date of Birth",
+    "noEmployees":  "No employees yet"
+  },
+
+  "settings": {
+    "title":       "Settings",
+    "appearance":  "Appearance",
+    "themeLabel":  "Theme & Language",
+    "colorTheme":  "Color Theme",
+    "language":    "Language",
+    "security":    "Security",
+    "changePass":  "Change Admin Password",
+    "currentPass": "Current password",
+    "newPass":     "New password",
+    "confirmPass": "Confirm new password",
+    "updatePass":  "Update Password",
+    "passMismatch":"Passwords do not match",
+    "passShort":   "New password must be at least 4 characters",
+    "passSuccess": "Password changed successfully",
+    "about":       "About",
+    "appInfo":     "Application Info",
+    "themes": {
+      "light":  "Light",
+      "dark":   "Dark",
+      "system": "System",
+      "lightDesc":  "Clean white interface",
+      "darkDesc":   "Easy on the eyes",
+      "systemDesc": "Follows your device"
+    }
+  },
+
+  "ticket": {
+    "title":       "Ticket",
+    "noItems":     "No items yet",
+    "total":       "Total",
+    "payment":     "Payment Repartition",
+    "remaining":   "Remaining",
+    "overpaid":    "Overpaid by",
+    "exact":       "Exact amount",
+    "cancel":      "Cancel",
+    "confirm":     "Confirm",
+    "parkTicket":  "Park ticket",
+    "newTicket":   "New ticket"
+  },
+
+  "pos": {
+    "productSale": "Product Sale",
+    "serviceSale": "Service Sale",
+    "packageSale": "Package Sale",
+    "searchProducts": "Search products…",
+    "searchServices": "Search services…",
+    "searchPackages": "Search packages…",
+    "noResults":      "No results",
+    "chooseEmployee": "Choose employee",
+    "todayExpenses":  "Today"
+  }
+}

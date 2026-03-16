@@ -1,0 +1,227 @@
+{
+  "nav": {
+    "dashboard":  "Tableau de bord",
+    "reports":    "Rapports",
+    "products":   "Produits",
+    "services":   "Services",
+    "packages":   "Forfaits",
+    "expenses":   "Dépenses",
+    "employees":  "Employés",
+    "settings":   "Paramètres",
+    "logout":     "Se déconnecter"
+  },
+
+  "common": {
+    "add":        "Ajouter",
+    "edit":       "Modifier",
+    "delete":     "Supprimer",
+    "save":       "Enregistrer",
+    "cancel":     "Annuler",
+    "confirm":    "Confirmer",
+    "search":     "Rechercher…",
+    "loading":    "Chargement…",
+    "noData":     "Aucune donnée",
+    "error":      "Une erreur est survenue",
+    "success":    "Succès",
+    "actions":    "Actions",
+    "name":       "Nom",
+    "price":      "Prix",
+    "amount":     "Montant",
+    "date":       "Date",
+    "note":       "Note",
+    "type":       "Type",
+    "status":     "Statut",
+    "total":      "Total",
+    "currency":   "FCFA"
+  },
+
+  "auth": {
+    "welcome":        "Bienvenue sur Simxel",
+    "readyMsg":       "Prêt pour une nouvelle journée de service ?",
+    "password":       "Saisissez le mot de passe",
+    "access":         "Accéder",
+    "wrongPassword":  "Mot de passe incorrect",
+    "adminSpace":     "Espace Admin",
+    "adminWelcome":   "Content de vous revoir, Patron",
+    "adminCode":      "Code de sécurité administrateur",
+    "unlock":         "Déverrouiller",
+    "refusedAccess":  "Accès refusé",
+    "logoutManager":  "Caissier déconnecté",
+    "logoutAdmin":    "Administrateur déconnecté"
+  },
+
+  "dashboard": {
+    "title":          "Tableau de bord",
+    "subtitle":       "Vue d'ensemble des performances",
+    "noSales":        "Aucune vente enregistrée pour cette période",
+    "period": {
+      "today":      "Aujourd'hui",
+      "yesterday":  "Hier",
+      "thisWeek":   "Cette semaine",
+      "thisMonth":  "Ce mois",
+      "thisYear":   "Cette année"
+    },
+    "kpi": {
+      "revenue":    "Chiffre d'affaires",
+      "commission": "Commissions",
+      "sales":      "Ventes",
+      "avgCart":    "Panier moyen"
+    },
+    "chart":          "Chiffre d'affaires",
+    "payments":       "Modes de paiement",
+    "totalCollected": "Total encaissé",
+    "topPerformers":  "Meilleurs performeurs"
+  },
+
+  "reports": {
+    "title":          "Rapports",
+    "subtitle":       "Export & Analyses",
+    "selectPeriod":   "Sélectionner une période",
+    "startDate":      "Date de début",
+    "endDate":        "Date de fin",
+    "generate":       "Générer",
+    "download":       "Télécharger",
+    "downloading":    "Téléchargement…",
+    "noResults":      "Aucun résultat pour cette période",
+    "summary": {
+      "title":          "Résumé des ventes",
+      "totalRevenue":   "Chiffre d'affaires",
+      "totalTx":        "Transactions",
+      "avgTx":          "Transaction moyenne",
+      "byPayment":      "Par mode de paiement"
+    },
+    "topItems": {
+      "title":    "Articles populaires",
+      "quantity": "Qté",
+      "revenue":  "Revenus"
+    },
+    "exports": {
+      "title":          "Exporter des rapports",
+      "salesJournal":   "Journal des ventes",
+      "salesJournalDesc": "Liste complète des transactions en Excel",
+      "staffPerf":      "Performance du personnel",
+      "staffPerfDesc":  "Commission et revenus par employé",
+      "stockStatus":    "État du stock",
+      "stockStatusDesc": "Instantané de l'inventaire actuel",
+      "financial":      "Bilan financier",
+      "financialDesc":  "Résumé revenus vs dépenses"
+    }
+  },
+
+  "products": {
+    "title":        "Inventaire",
+    "subtitle":     "Gestion des produits",
+    "addProduct":   "Ajouter un produit",
+    "name":         "Nom du produit",
+    "salePrice":    "Prix de vente",
+    "unitCost":     "Coût unitaire",
+    "stock":        "En stock",
+    "minAlert":     "Alerte stock faible",
+    "outOfStock":   "Rupture de stock",
+    "lowStock":     "Stock faible",
+    "inStock":      "en stock",
+    "noProducts":   "Aucun produit"
+  },
+
+  "services": {
+    "title":       "Panel de services",
+    "subtitle":    "Gestion des services",
+    "addService":  "Ajouter un service",
+    "name":        "Nom du service",
+    "price":       "Prix",
+    "noServices":  "Aucun service"
+  },
+
+  "packages": {
+    "title":        "Forfaits & Offres",
+    "subtitle":     "Gestion des offres combinées",
+    "addPackage":   "Ajouter un forfait",
+    "included":     "Services inclus",
+    "noServices":   "Aucun service lié",
+    "noPackages":   "Aucun forfait"
+  },
+
+  "expenses": {
+    "title":         "Journal des dépenses",
+    "subtitle":      "Sorties de caisse en temps réel",
+    "addExpense":    "Nouvelle dépense",
+    "totalExpenses": "Total des dépenses",
+    "thisMonth":     "Ce mois",
+    "noExpenses":    "Aucune dépense enregistrée",
+    "type":          "Type de dépense",
+    "types": {
+      "Rent":        "Loyer",
+      "Electricity": "Électricité",
+      "Water":       "Eau",
+      "Supplies":    "Fournitures",
+      "Salary":      "Salaire",
+      "Transport":   "Transport",
+      "Maintenance": "Entretien",
+      "Marketing":   "Marketing",
+      "Other":       "Autre"
+    }
+  },
+
+  "employees": {
+    "title":        "Employés",
+    "subtitle":     "Gestion des profils",
+    "addEmployee":  "Ajouter un employé",
+    "commission":   "Commission",
+    "role":         "Rôle",
+    "dob":          "Date de naissance",
+    "noEmployees":  "Aucun employé"
+  },
+
+  "settings": {
+    "title":       "Paramètres",
+    "appearance":  "Apparence",
+    "themeLabel":  "Thème & Langue",
+    "colorTheme":  "Thème de couleur",
+    "language":    "Langue",
+    "security":    "Sécurité",
+    "changePass":  "Changer le mot de passe admin",
+    "currentPass": "Mot de passe actuel",
+    "newPass":     "Nouveau mot de passe",
+    "confirmPass": "Confirmer le nouveau mot de passe",
+    "updatePass":  "Mettre à jour",
+    "passMismatch":"Les mots de passe ne correspondent pas",
+    "passShort":   "Le mot de passe doit contenir au moins 4 caractères",
+    "passSuccess": "Mot de passe modifié avec succès",
+    "about":       "À propos",
+    "appInfo":     "Informations de l'application",
+    "themes": {
+      "light":  "Clair",
+      "dark":   "Sombre",
+      "system": "Système",
+      "lightDesc":  "Interface blanche épurée",
+      "darkDesc":   "Agréable pour les yeux",
+      "systemDesc": "Suit votre appareil"
+    }
+  },
+
+  "ticket": {
+    "title":       "Ticket",
+    "noItems":     "Aucun article",
+    "total":       "Total",
+    "payment":     "Répartition du paiement",
+    "remaining":   "Restant",
+    "overpaid":    "Trop perçu de",
+    "exact":       "Montant exact",
+    "cancel":      "Annuler",
+    "confirm":     "Confirmer",
+    "parkTicket":  "Garer le ticket",
+    "newTicket":   "Nouveau ticket"
+  },
+
+  "pos": {
+    "productSale": "Vente de produits",
+    "serviceSale": "Vente de services",
+    "packageSale": "Vente de forfaits",
+    "searchProducts": "Rechercher des produits…",
+    "searchServices": "Rechercher des services…",
+    "searchPackages": "Rechercher des forfaits…",
+    "noResults":      "Aucun résultat",
+    "chooseEmployee": "Choisir un employé",
+    "todayExpenses":  "Aujourd'hui"
+  }
+}
