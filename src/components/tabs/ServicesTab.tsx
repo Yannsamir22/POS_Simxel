@@ -1,27 +1,28 @@
-import React, {useState, useEffect} from 'react'
-import Loading from '../../loadash/Loading'
-import { useServiceStore } from '../../stores/serviceStore'
-import { useTicketStore } from '../../stores/useTicketStore'
-import SearchBar from '../SearchBar'
+import React, { useEffect, useState } from "react";
+import Loading from "../../loadash/Loading";
+import { useServiceStore } from "../../stores/serviceStore";
+import { useTicketStore } from "../../stores/useTicketStore";
+import SearchBar from "../SearchBar";
 const ServicesTab: React.FC = () => {
-  const {services, fetchServices, loading} = useServiceStore();
+  const { services, fetchServices, loading } = useServiceStore();
   const addItem = useTicketStore((state) => state.addItem);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchServices();
-  }, []);
+  }, [fetchServices]);
 
-  const filteredServices = services.filter((service) => service.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredServices = services.filter((service) =>
+    service.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   if (loading) {
-    return <Loading message='Loading Services...'/>;
+    return <Loading message="Loading Services..." />;
   }
   return (
-    <div>
-      <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full">
       {/* Search bar */}
-      <div className="flex justify-between items-center px-10 border-b border-base-300 py-4">
+      <div className="flex justify-between items-center px-6 border-b border-base-300 py-4">
         <h1 className="uppercase tracking-tighter font-extrabold">
           Service Sale
         </h1>
@@ -31,7 +32,17 @@ const ServicesTab: React.FC = () => {
           placeholder="Search Services..."
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 p-20">
+      {/* Empty state */}
+      {filteredServices.length === 0 && (
+        <div className="flex-1 flex items-center justify-center opacity-30">
+          <p className="font-black uppercase tracking-widest text-sm">
+            {search ? "No results" : "No services yet"}
+          </p>
+        </div>
+      )}
+
+      {/* Service List */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-20">
         {filteredServices.map((s) => (
           <div
             key={s.id}
@@ -44,16 +55,19 @@ const ServicesTab: React.FC = () => {
                 quantity: 1,
               })
             }
-            className="p-4 bg-base-200 rounded-xl hover:bg-primary/20 cursor-pointer flex justify-between items-center"
+            className="p-4 bg-base-200 border border-base-content rounded-xl hover:border-primary hover:bg-primary/20 cursor-pointer flex  active:scale-95 transition-all justify-between items-center"
           >
-            <span>{s.name}</span>
-            <span>{s.price} FCFA</span>
+            <span className="font-bold text-sm uppercase tracking-tight">
+              {s.name}
+            </span>
+            <span className="font-black text-primary italic text-sm">
+              {s.price.toLocaleString()} FCFA
+            </span>
           </div>
         ))}
       </div>
     </div>
-    </div>
-  )
-}
+  );
+};
 
-export default ServicesTab
+export default ServicesTab;

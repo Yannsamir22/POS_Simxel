@@ -11,10 +11,6 @@ export interface AuthState {
 
 export interface AuthActions {
 
-  // setupSystem: (
-  //   mainPassword: string,
-  //   adminPassword: string
-  // ) => Promise<{ success: boolean; error?: string }>;
 
   checkAuth: () => Promise<void>;
 

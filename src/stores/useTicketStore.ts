@@ -3,6 +3,13 @@ import { SalesService } from "../services/salesService";
 
 export type TicketItemType = "PRODUCT" | "SERVICE" | "PACKAGE";
 
+export interface PackageService {
+  serviceId: string;
+  name: string;
+  price: number;
+  employeeId?: string;
+}
+
 export interface TicketItem {
   id: string;
   name: string;
@@ -10,14 +17,8 @@ export interface TicketItem {
   type: TicketItemType;
   quantity: number;
   employeeId?: string;
+  // Only for PACKAGE type: individual service employee assignments
   services?: PackageService[];
-}
-
-export interface PackageService {
-  serviceId: string;
-  name: string;
-  price: number;
-  employeeId?: string;
 }
 
 export interface PaymentInput {
@@ -41,141 +42,117 @@ type TicketState = {
   addItem: (item: TicketItem) => void;
   removeItem: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
-
   clearTicket: () => void;
-
   parkTicket: () => void;
   loadTicket: (index: number) => void;
   selectPendingTicket: (index: number) => void;
   removePendingTicket: (index: number) => void;
-
   addPayment: (payment: PaymentInput) => void;
-
-  confirmTicket: () => Promise<void>;
-
+  clearPayments: () => void;
+  confirmTicket: () => Promise<{ success: boolean; error?: string }>;
   assignEmployee: (itemId: string, employeeId: string) => void;
   assignPackageEmployee: (
     itemId: string,
     serviceId: string,
-    employeeId: string,
+    employeeId: string
   ) => void;
 };
 
-export const useTicketStore = create<TicketState>((set, get) => ({
-  currentTicket: {
+function freshTicket(): Ticket {
+  return {
     id: crypto.randomUUID(),
     items: [],
     payments: [],
     createdAt: Date.now(),
     total: 0,
-  },
+  };
+}
 
+function calcTotal(items: TicketItem[]): number {
+  return items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+}
+
+export const useTicketStore = create<TicketState>((set, get) => ({
+  currentTicket: freshTicket(),
   pendingTickets: [],
   selectedPendingIndex: null,
 
+  // ─── ADD ITEM 
   addItem: (item) =>
-  set((state) => {
-    const existing = state.currentTicket.items.find((i) => i.id === item.id);
-    let newItems;
+    set((state) => {
+      const existing = state.currentTicket.items.find((i) => i.id === item.id);
+      let newItems: TicketItem[];
 
-    if (existing && item.type === "PRODUCT") {
-      newItems = state.currentTicket.items.map((i) =>
-        i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-      );
-    } else {
-      newItems = [...state.currentTicket.items, item];
-    }
+      // Only stack quantity for PRODUCT; services/packages always add as new rows
+      if (existing && item.type === "PRODUCT") {
+        newItems = state.currentTicket.items.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        );
+      } else {
+        newItems = [...state.currentTicket.items, { ...item }];
+      }
 
-    const newTotal = newItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      return {
+        currentTicket: {
+          ...state.currentTicket,
+          items: newItems,
+          total: calcTotal(newItems),
+        },
+      };
+    }),
 
-    return {
-      currentTicket: {
-        ...state.currentTicket,
-        items: newItems,
-        total: newTotal,
-      },
-    };
-  }),
-
+  // ─── REMOVE ITEM 
   removeItem: (id) =>
     set((state) => {
       const items = state.currentTicket.items.filter((i) => i.id !== id);
-      const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-
       return {
-        currentTicket: {
-          ...state.currentTicket,
-          items,
-          total,
-        },
+        currentTicket: { ...state.currentTicket, items, total: calcTotal(items) },
       };
     }),
 
+  // ─── UPDATE QTY 
   updateQty: (id, qty) =>
     set((state) => {
+      if (qty <= 0) {
+        // Remove item if qty hits 0
+        const items = state.currentTicket.items.filter((i) => i.id !== id);
+        return { currentTicket: { ...state.currentTicket, items, total: calcTotal(items) } };
+      }
       const items = state.currentTicket.items.map((i) =>
-        i.id === id ? { ...i, quantity: qty } : i,
+        i.id === id ? { ...i, quantity: qty } : i
       );
-      const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-
       return {
-        currentTicket: {
-          ...state.currentTicket,
-          items,
-          total,
-        },
+        currentTicket: { ...state.currentTicket, items, total: calcTotal(items) },
       };
     }),
 
-  clearTicket: () =>
-    set({
-      currentTicket: {
-        id: crypto.randomUUID(),
-        items: [],
-        payments: [],
-        createdAt: Date.now(),
-        total: 0,
-      },
-    }),
+  // ─── CLEAR TICKET 
+  clearTicket: () => set({ currentTicket: freshTicket() }),
 
+  // ─── PARK / LOAD 
   parkTicket: () =>
-    set((state) => {
-      const newTicket = { ...state.currentTicket };
-      return {
-        pendingTickets: [...state.pendingTickets, newTicket],
-        selectedPendingIndex: state.pendingTickets.length,
-        currentTicket: {
-          id: crypto.randomUUID(),
-          items: [],
-          payments: [],
-          createdAt: Date.now(),
-          total: 0,
-        },
-      };
-    }),
+    set((state) => ({
+      pendingTickets: [...state.pendingTickets, { ...state.currentTicket }],
+      selectedPendingIndex: state.pendingTickets.length,
+      currentTicket: freshTicket(),
+    })),
 
   loadTicket: (index) =>
     set((state) => {
       const ticket = state.pendingTickets[index];
-
-      const pending = [...state.pendingTickets];
-      pending.splice(index, 1);
-
-      return {
-        currentTicket: ticket,
-        pendingTickets: pending,
-        selectedPendingIndex: null,
-      };
+      const pending = state.pendingTickets.filter((_, i) => i !== index);
+      return { currentTicket: ticket, pendingTickets: pending, selectedPendingIndex: null };
     }),
 
   selectPendingTicket: (index) => set({ selectedPendingIndex: index }),
-  removePendingTicket: (index) =>
-    set((state) => {
-      const pending = [...state.pendingTickets];
-      pending.splice(index, 1);
-      return { pendingTickets: pending, selectedPendingIndex: null };
-    }),
 
+  removePendingTicket: (index) =>
+    set((state) => ({
+      pendingTickets: state.pendingTickets.filter((_, i) => i !== index),
+      selectedPendingIndex: null,
+    })),
+
+  // ─── PAYMENTS ─────────────────────────────────────────────────────────────
   addPayment: (payment) =>
     set((state) => ({
       currentTicket: {
@@ -184,10 +161,30 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       },
     })),
 
+  clearPayments: () =>
+    set((state) => ({
+      currentTicket: { ...state.currentTicket, payments: [] },
+    })),
+
+  // ─── CONFIRM TICKET ───────────────────────────────────────────────────────
   confirmTicket: async () => {
     const ticket = get().currentTicket;
 
-    if (ticket.items.length === 0) return;
+    if (ticket.items.length === 0) {
+      return { success: false, error: "Ticket is empty" };
+    }
+    if (ticket.payments.length === 0) {
+      return { success: false, error: "No payment provided" };
+    }
+
+    // Validate payment total matches ticket total
+    const paid = ticket.payments.reduce((s, p) => s + p.amount, 0);
+    if (Math.abs(paid - ticket.total) > 1) {
+      return {
+        success: false,
+        error: `Payment mismatch. Paid: ${paid}, Expected: ${ticket.total}`,
+      };
+    }
 
     try {
       const payload = {
@@ -196,55 +193,55 @@ export const useTicketStore = create<TicketState>((set, get) => ({
           type: item.type,
           quantity: item.quantity,
           employeeId: item.employeeId,
-          services: item.services, // Include sub-services for packages
+          // For packages, pass per-service employee assignments if set
+          ...(item.type === "PACKAGE" && item.services
+            ? {
+                services: item.services.map((s) => ({
+                  serviceId: s.serviceId,
+                  employeeId: s.employeeId,
+                })),
+              }
+            : {}),
         })),
         payments: ticket.payments,
       };
 
-      console.debug("[TicketStore] confirmTicket payload:", payload);
-
       await SalesService.createSale(payload);
-
-      set({
-        currentTicket: {
-          id: crypto.randomUUID(),
-          items: [],
-          payments: [],
-          createdAt: Date.now(),
-          total: 0,
-        },
-      });
-
-      console.log("Sale Confirmed!");
-    } catch (error) {
-      console.error("Failed to confirm sale:", error);
+      set({ currentTicket: freshTicket() });
+      return { success: true };
+    } catch (error: any) {
+      const msg =
+        error.response?.data?.error ?? error.message ?? "Failed to confirm sale";
+      console.error("[TicketStore] confirmTicket error:", msg);
+      return { success: false, error: msg };
     }
   },
 
+  // ─── ASSIGN EMPLOYEE ──────────────────────────────────────────────────────
   assignEmployee: (itemId, employeeId) =>
-    set((state) => {
-      const updatedItems = state.currentTicket.items.map((item) =>
-        item.id === itemId ? { ...item, employeeId } : item,
-      );
-      return { currentTicket: { ...state.currentTicket, items: updatedItems } };
-    }),
+    set((state) => ({
+      currentTicket: {
+        ...state.currentTicket,
+        items: state.currentTicket.items.map((item) =>
+          item.id === itemId ? { ...item, employeeId } : item
+        ),
+      },
+    })),
+
+  // For packages: assign an employee to a specific service inside the package
   assignPackageEmployee: (itemId, serviceId, employeeId) =>
-    set((state) => {
-      const updatedItems = state.currentTicket.items.map((item) => {
-        if (item.id !== itemId) return item;
-
-        if (!item.services) return item;
-
-        const updatedServices = item.services.map((service) =>
-          service.serviceId === serviceId
-            ? { ...service, employeeId }
-            : service,
-        );
-        return { ...item, services: updatedServices };
-      });
-
-      return {
-        currentTicket: { ...state.currentTicket, items: updatedItems },
-      };
-    }),
+    set((state) => ({
+      currentTicket: {
+        ...state.currentTicket,
+        items: state.currentTicket.items.map((item) => {
+          if (item.id !== itemId || !item.services) return item;
+          return {
+            ...item,
+            services: item.services.map((s) =>
+              s.serviceId === serviceId ? { ...s, employeeId } : s
+            ),
+          };
+        }),
+      },
+    })),
 }));

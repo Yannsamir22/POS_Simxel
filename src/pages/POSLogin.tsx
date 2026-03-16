@@ -1,11 +1,12 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "../stores/authStore";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navigations/Navbar";
 
-const POSLogin = () => {
+const POSLogin: React.FC = () => {
   const [pin, setPin] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate();
   const loginAsManager = useAuthStore((state) => state.loginAsManager);
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -13,18 +14,20 @@ const POSLogin = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(false);
+    if(!pin.trim()) return;
+    setError(null);
+    setSubmitting(true);
     
     const res = await loginAsManager({ password: pin });
 
     if (res.success) {
-      await checkAuth();
-      console.log("Login successful");
       navigate("/");
     } else {
-      setError(true);
+      setError(res.error ?? "Incorrect password");
       setPin("");
     }
+
+    setSubmitting(false);
   };
   const msg = "Welcome to Simxel";
   return (
@@ -57,20 +60,26 @@ const POSLogin = () => {
                     value={pin}
                     onChange={(e) => {
                       setPin(e.target.value);
-                      setError(false);
+                      setError(null);
                     }}
                     autoFocus
+                    disabled={submitting}
                   />
                 </div>
                 <div className="relative w-1/2">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary" />
-                  <button type="submit" className="btn w-full font-semibold">
-                    Access
+                  <button type="submit" className="btn w-full font-semibold"
+                  disabled={submitting}>
+                    {submitting ? (
+                      <span className="loading loading-spinner loading-xs" />
+                    ) : (
+                      "Access"
+                    )}
                   </button>
                 </div>
                 {error && (
                   <p className="text-error font-bold text-sm ml-2">
-                    Password incorrect
+                    {error}
                   </p>
                 )}
               </form>

@@ -1,37 +1,130 @@
-import {create} from "zustand"
-import {getPackages} from "../services/packageService";
+import { create } from "zustand";
+import {
+  fetchPackages,
+  createPackage,
+  updatePackage,
+  deletePackage,
+} from "../services/packageService";
 
-export interface Packages{
-      id: string;
-      name: string;
-      price: number;
-      services: string[];
+export interface PackageService {
+  serviceId: string;
+  name: string;
+  price: number;
+}
+
+export interface Package {
+  id: string;
+  name: string;
+  price: number;
+  // Backend returns items: { service: { id, name, price } }[]
+  // We flatten these into a services array for easier UI consumption
+  services: PackageService[];
 }
 
 type PackageState = {
-      packages: Packages[];
-      loading: boolean;
-      fetchPackages: () => Promise<void>;
+  packages: Package[];
+  loading: boolean;
+  error: string | null;
 
+  fetchPackages: () => Promise<void>;
+  addPackage: (data: {
+    name: string;
+    price: number;
+    serviceIds: string[];
+  }) => Promise<{ success: boolean; error?: string }>;
+  editPackage: (
+    id: string,
+    data: { name?: string; price?: number; serviceIds?: string[] }
+  ) => Promise<{ success: boolean; error?: string }>;
+  removePackage: (id: string) => Promise<{ success: boolean; error?: string }>;
+};
+
+// Normalize backend package shape → flat services array for the UI
+function normalize(pkg: any): Package {
+  return {
+    id: pkg.id,
+    name: pkg.name,
+    price: pkg.price,
+    services: (pkg.items ?? []).map((item: any) => ({
+      serviceId: item.service?.id ?? item.serviceId,
+      name: item.service?.name ?? item.name ?? "Unknown",
+      price: item.service?.price ?? item.price ?? 0,
+    })),
+  };
 }
 
 export const usePackageStore = create<PackageState>((set) => ({
-      packages: [],
-      loading: false,
+  packages: [],
+  loading: false,
+  error: null,
 
-      fetchPackages: async () => {
-            set({loading: true});
+  fetchPackages: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetchPackages();
+      // Backend shape: { ok: true, packages: Package[] }
+      const raw: any[] = res.packages ?? [];
+      set({ packages: raw.map(normalize), loading: false });
+    } catch (error: any) {
+      const msg = error.response?.data?.error ?? "Failed to fetch packages";
+      console.error(msg);
+      set({ loading: false, error: msg });
+    }
+  },
 
-            try{
-                  const res = await getPackages();
-                  console.log(res.data);
-                  set({
-                        packages: res.data,
-                        loading: false,
-                  });
-            } catch(error: any) {
-                  console.error("Failed to fetch packages, ", error);
-                  set({loading: false})
-            }
+  addPackage: async (data) => {
+    try {
+      const res = await createPackage(data);
+      if (res.ok) {
+        set((state) => ({
+          packages: [...state.packages, normalize(res.package)],
+        }));
+        return { success: true };
       }
-}))
+      return { success: false, error: res.error };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error ?? "Failed to create package",
+      };
+    }
+  },
+
+  editPackage: async (id, data) => {
+    try {
+      const res = await updatePackage(id, data);
+      if (res.ok) {
+        set((state) => ({
+          packages: state.packages.map((p) =>
+            p.id === id ? normalize(res.package) : p
+          ),
+        }));
+        return { success: true };
+      }
+      return { success: false, error: res.error };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error ?? "Failed to update package",
+      };
+    }
+  },
+
+  removePackage: async (id) => {
+    try {
+      const res = await deletePackage(id);
+      if (res.ok) {
+        set((state) => ({
+          packages: state.packages.filter((p) => p.id !== id),
+        }));
+        return { success: true };
+      }
+      return { success: false, error: res.error };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error ?? "Failed to delete package",
+      };
+    }
+  },
+}));

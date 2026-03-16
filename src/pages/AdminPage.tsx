@@ -7,12 +7,11 @@ import ExpenseManagement from "../components/Management/ExpenseManagement";
 import PackManagement from "../components/Management/PackManagement";
 import ProductManagement from "../components/Management/ProductManagement";
 import ServiceManagement from "../components/Management/ServiceManagement";
+import { useAuthStore } from "../stores/authStore";
 
-interface AdminPageProps {
-  onLogout: () => void;
-}
 
-const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
+const AdminPage: React.FC = () => {
+  const adminLogout = useAuthStore((state) => state.adminLogout);  
   const [activeTab, setActiveTab] = useState("Dashboard");
 
   const renderContent = () => {
@@ -29,6 +28,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
         return <ExpenseManagement />;
       case "Dashboard":
         return <Dashboard />;
+      case "Reports" : return <div className="p-8 opacity-40 text-center font-black uppercase tracking-widest">Reports Coming Soon...</div>;
       default:
         return <Dashboard />;
     }
@@ -42,7 +42,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          onLogout={onLogout}
+          onLogout={adminLogout}
         />
       </div>
 

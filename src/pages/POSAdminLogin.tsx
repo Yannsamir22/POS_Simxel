@@ -1,31 +1,37 @@
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../stores/authStore";
 import Navbar from "../components/navigations/Navbar";
+import { useAuthStore } from "../stores/authStore";
 
-const POSAdminLogin = () => {
+const POSAdminLogin: React.FC = () => {
   const [pin, setPin] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const loginAsAdmin = useAuthStore((state) => state.loginAsAdmin);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!pin.trim()) return;
+    setError(null);
+    setSubmitting(true);
+
     const res = await loginAsAdmin({ password: pin });
     if (res.success) {
-      navigate("/admin");
+      navigate("/admin", { replace: true });
     } else {
-      setError(true);
+      setError(res.error ?? "Access refused");
       setPin("");
     }
+    setSubmitting(false);
   };
   return (
     <div className="h-screen overflow-hidden flex flex-col w-full relative">
-        <Navbar />
+      <Navbar />
       <button
         type="button"
-        onClick={() => navigate("/login")}
+        onClick={() => navigate("/")}
         className="absolute top-20 left-6 btn btn-outline rounded-full flex items-center size-12"
       >
         <ArrowLeft />
@@ -53,9 +59,10 @@ const POSAdminLogin = () => {
                       value={pin}
                       onChange={(e) => {
                         setPin(e.target.value);
-                        setError(false);
+                        setError(null);
                       }}
                       autoFocus
+                      disabled={submitting}
                     />
                   </div>
                   <div className="relative w-1/3">
@@ -63,14 +70,17 @@ const POSAdminLogin = () => {
                     <button
                       type="submit"
                       className="btn w-full font-semibold active:outline-none"
+                      disabled={submitting}
                     >
-                      Unlock
+                      {submitting ? (
+                        <span className="loading loading-spinner loading-xs" />
+                      ) : (
+                        "Unlock"
+                      )}
                     </button>
                   </div>
                   {error && (
-                    <p className="text-error font-bold text-sm ml-2">
-                      Refused Access
-                    </p>
+                    <p className="text-error font-bold text-sm ml-2">{error}</p>
                   )}
                 </form>
               </div>

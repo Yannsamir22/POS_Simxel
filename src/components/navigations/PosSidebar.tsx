@@ -6,31 +6,33 @@ import {
   Settings,
   ShoppingBag,
 } from "lucide-react";
-// interface for the shared functionality of the sidebar component, including active tab state and logout handler
 interface SidebarProps {
   activeTab: string; // the currently active tab in the sidebar
   setActiveTab: (tab: string) => void; // function to update the active sidebar
   onLogout: () => void; // function to handle user logout action
 }
-const PosSidebar: React.FC<SidebarProps> = ({
-  activeTab,
-  setActiveTab,
-  onLogout,
-}) => {
-  const menu = [
+
+const menu = [
     { name: "Packages", icon: Package },
     { name: "Services", icon: HeartHandshake },
     { name: "Products", icon: ShoppingBag },
     { name: "Expenses", icon: Receipt },
     { name: "Settings", icon: Settings },
   ];
+const PosSidebar: React.FC<SidebarProps> = ({
+  activeTab,
+  setActiveTab,
+  onLogout,
+}) => {
+  
   return (
-    <aside className="max-h-screen w-20 flex flex-col bg-base-100 border border-base-300 shrink-0 justify-center mt-[20vh] rounded-2xl fixed">
-      <nav className="flex-1 px-1 py-6 space-y-5 flex-col flex items-center justify-center">
+    <aside className="max-h-screen w-20 flex flex-col bg-base-100 border border-base-300 shrink-0 justify-between top-50 py-2 space-y-2 rounded-2xl fixed">
+      <nav className="flex-1 px-1 py-6 space-y-5 flex-col flex items-center ">
         {menu.map(({ name, icon: Icon }) => (
           <button 
             key={name}
             onClick={() => setActiveTab(name)}
+            title={name}
             className={`flex items-center rounded-md p-1 hover:text-accent hover:scale-125 ${
       activeTab === name ? "text-accent scale-125" : ''}`}>
             <Icon size={20} />
@@ -42,7 +44,8 @@ const PosSidebar: React.FC<SidebarProps> = ({
       <div className="border-t border-base-300 p-4 space-y-4">
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 hover:bg-inherit px-4 py-3 rounded-xl w-full transition font-extrabold text-red-500"
+          title="Log out"
+          className="flex flex-col items-center p-2 rounded-xl text-error hover:bg-error/10 transition-all"
         >
           <LogOut size={20} />
         </button>

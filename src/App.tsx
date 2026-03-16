@@ -7,16 +7,6 @@ import POSPage from "./pages/POSPage";
 import AdminPage from "./pages/AdminPage";
 import { useAuthStore } from "./stores/authStore";
 
-function ProtectedRoute({ children, accessLevel }: { children: JSX.Element; accessLevel?: "manager" | "admin" }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const userAccessLevel = useAuthStore((state) => state.accessLevel);
-
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (accessLevel && userAccessLevel !== accessLevel) return <Navigate to="/login" replace />;
-
-  return children;
-}
-
 function App() {
   const [loading, setLoading] = useState(true);
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -62,8 +52,6 @@ function App() {
             }
           />
 
-          {/* Protected Routes */}
-          {/* <Route path="/" element={<ProtectedRoute accessLevel="manager"><POSPage /></ProtectedRoute>} /> */}
             <Route path="/" element={isAuthenticated ? <POSPage/> : <POSLogin />} />
           <Route path="/admin" element={isAuthenticated && accessLevel=="admin" ? <AdminPage/> : <POSAdminLogin/>} />
 
