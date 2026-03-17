@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuthStore } from "../stores/authStore";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navigations/Navbar";
+import { useT } from "../hooks/useT";
 
 const POSLogin: React.FC = () => {
   const [pin, setPin] = useState("");
@@ -23,13 +24,14 @@ const POSLogin: React.FC = () => {
     if (res.success) {
       navigate("/");
     } else {
-      setError(res.error ?? "Incorrect password");
+      setError(res.error ?? t("auth.wrongPassword"));
       setPin("");
     }
 
     setSubmitting(false);
   };
-  const msg = "Welcome to Simxel";
+  
+  const {t} = useT();
   return (
     <div className="h-screen overflow-hidden flex flex-col w-full">
       <Navbar />
@@ -40,10 +42,10 @@ const POSLogin: React.FC = () => {
             <h1
               className={`text-5xl font-extrabold text-primary `}
             >
-              {msg}
+              {t("auth.welcome")}
             </h1>
             <p className="mt-2 text-base-content/60">
-              Ready for a new day of service?
+              {t("auth.readyMsg")}
             </p>
             <div className="mt-10 flex flex-col justify-center items-center w-full">
               <form
@@ -56,7 +58,7 @@ const POSLogin: React.FC = () => {
                   <input
                     className={`input w-full pl-6 ${error ? "input-error" : ""}`}
                     type="password"
-                    placeholder="Enter the Password"
+                    placeholder={t("auth.password")}
                     value={pin}
                     onChange={(e) => {
                       setPin(e.target.value);
@@ -73,7 +75,7 @@ const POSLogin: React.FC = () => {
                     {submitting ? (
                       <span className="loading loading-spinner loading-xs" />
                     ) : (
-                      "Access"
+                      t("auth.access")
                     )}
                   </button>
                 </div>

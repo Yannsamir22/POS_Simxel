@@ -11,8 +11,9 @@ import {
 import React, { useState } from "react";
 import { useAuthStore } from "../../stores/authStore";
 import { useLanguageStore } from "../../stores/languageStore";
+import { useT } from "../../hooks/useT";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Types ────────────
 type ThemeChoice = "light" | "dark" | "system";
 
 function resolveAndApply(choice: ThemeChoice) {
@@ -209,7 +210,7 @@ const SystemPreview: React.FC = () => (
   </svg>
 );
 
-// ─── Theme card config ────────────────────────────────────────────────────────
+// Theme card config 
 const THEMES: {
   label: string;
   value: ThemeChoice;
@@ -242,6 +243,7 @@ const THEMES: {
 
 // Component 
 const SettingsTab: React.FC = () => {
+  const {t} = useT();
   const { language, setLanguage } = useLanguageStore();
 const [theme, setThemeState] = useState<ThemeChoice>(
     () => (localStorage.getItem("theme") as ThemeChoice) ?? "system",

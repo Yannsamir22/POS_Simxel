@@ -5,6 +5,7 @@ import {
   Users,
   BarChart2,
 } from "lucide-react";
+import { useT } from "../../../hooks/useT";
 
 interface OverviewItem {
   label: string;
@@ -26,6 +27,8 @@ const COLORS = [
 ];
 
 const StatsOverview: React.FC<StatsOverviewProps> = ({ overview }) => {
+
+  const {t} = useT()
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {overview.map((item, i) => {
@@ -44,7 +47,7 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({ overview }) => {
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-black uppercase opacity-50 tracking-[0.2em] truncate">
-                {item.label}
+                {item.label === "Average Cart" ? t("dashboard.kpi.avgCart") : t(`dashboard.kpi.${item.label.toLowerCase()}`)}
               </p>
               <p className={`text-xl font-black leading-none mt-1 ${color.text}`}>
                 {item.value.toLocaleString()}

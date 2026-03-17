@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight, PlusSquare } from "lucide-react";
 import { useState } from "react";
 import { useTicketStore } from "../../stores/useTicketStore";
 import TicketItemRenderer from "../ticket/TicketItemRenderer";
+import { useT } from "../../hooks/useT";
 
 const PAYMENT_METHODS = [
   { label: "Cash", method: "CASH" },
@@ -21,6 +22,8 @@ const TicketSidebar = () => {
     pendingTickets,
     loadTicket,
   } = useTicketStore();
+
+  const {t} = useT();
 
   const [paymentAmounts, setPaymentAmounts] = useState<Record<string, number>>({
     CASH: 0, OM: 0, MOMO: 0, CARD: 0,
@@ -69,7 +72,7 @@ const TicketSidebar = () => {
       <div className="p-4 bg-base-200 border-b border-base-300">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-xl font-black italic text-primary tracking-tighter uppercase">
-            Ticket
+            {t("ticket.title")}
             {pendingTickets.length > 0 && (
               <span className="ml-2 badge badge-primary badge-sm">
                 +{pendingTickets.length}
@@ -110,7 +113,7 @@ const TicketSidebar = () => {
 
         {/* Running total */}
         <div className="flex justify-between items-center bg-base-100 p-2 rounded-xl border border-base-300 shadow-inner">
-          <span className="text-xs font-bold opacity-50 uppercase">Total</span>
+          <span className="text-xs font-bold opacity-50 uppercase">{t("ticket.total")}</span>
           <span className="text-xl font-black text-primary">
             {currentTicket.total.toLocaleString()}{" "}
             <span className="text-xs">FCFA</span>
@@ -122,7 +125,7 @@ const TicketSidebar = () => {
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
         {currentTicket.items.length === 0 ? (
           <p className="text-center text-xs opacity-30 font-bold uppercase tracking-widest mt-8">
-            No items yet
+            {t("ticket.noItems")}
           </p>
         ) : (
           currentTicket.items.map((item) => (
@@ -134,7 +137,7 @@ const TicketSidebar = () => {
       {/* ── PAYMENT FOOTER ── */}
       <div className="p-3 bg-base-200 border-t border-base-300 rounded-t-3xl shadow-[0_-10px_20px_rgba(0,0,0,0.1)]">
         <h3 className="text-[10px] font-black uppercase opacity-40 mb-3 tracking-widest text-center">
-          Payment Repartition
+          {t("ticket.payment")}
         </h3>
 
         <div className="grid grid-cols-2 gap-1 mb-2">
@@ -166,10 +169,10 @@ const TicketSidebar = () => {
         {currentTicket.total > 0 && (
           <div className={`text-xs font-bold text-center mb-2 ${remaining > 0 ? "text-warning" : remaining < 0 ? "text-error" : "text-success"}`}>
             {remaining > 0
-              ? `Remaining: ${remaining.toLocaleString()} FCFA`
+              ? `${t("ticket.remaining")}: ${remaining.toLocaleString()} FCFA`
               : remaining < 0
-              ? `Overpaid by: ${Math.abs(remaining).toLocaleString()} FCFA`
-              : "✓ Exact amount"}
+              ? `${t("ticket.overpaid")}: ${Math.abs(remaining).toLocaleString()} FCFA`
+              :  `${t("ticket.exact")}`}
           </div>
         )}
 
@@ -186,7 +189,7 @@ const TicketSidebar = () => {
             onClick={() => { clearTicket(); resetPayments(); }}
             className="btn btn-ghost btn-md rounded-md uppercase font-bold text-error border border-error/20 hover:bg-error/10"
           >
-            Cancel
+            {t("ticket.cancel")}
           </button>
           <button
             onClick={handleConfirm}
@@ -200,7 +203,7 @@ const TicketSidebar = () => {
             {confirming ? (
               <span className="loading loading-spinner loading-xs" />
             ) : (
-              "Confirm"
+              `${t("ticket.confirm")}`
             )}
           </button>
         </div>

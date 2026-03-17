@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useT } from "../../hooks/useT";
 import Loading from "../../loadash/Loading";
 import { useServiceStore } from "../../stores/serviceStore";
 import { useTicketStore } from "../../stores/useTicketStore";
 import SearchBar from "../SearchBar";
 const ServicesTab: React.FC = () => {
+  const { t } = useT();
   const { services, fetchServices, loading } = useServiceStore();
   const addItem = useTicketStore((state) => state.addItem);
   const [search, setSearch] = useState("");
@@ -17,19 +19,19 @@ const ServicesTab: React.FC = () => {
   );
 
   if (loading) {
-    return <Loading message="Loading Services..." />;
+    return <Loading message={t("common.loading")} />;
   }
   return (
     <div className="flex flex-col h-full">
       {/* Search bar */}
       <div className="flex justify-between items-center px-6 border-b border-base-300 py-4">
         <h1 className="uppercase tracking-tighter font-extrabold">
-          Service Sale
+          {t("pos.serviceSale")}
         </h1>
         <SearchBar
           value={search}
           onChange={setSearch}
-          placeholder="Search Services..."
+          placeholder={t("pos.searchServices")}
         />
       </div>
       {/* Empty state */}
@@ -42,7 +44,7 @@ const ServicesTab: React.FC = () => {
       )}
 
       {/* Service List */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-20">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-15">
         {filteredServices.map((s) => (
           <div
             key={s.id}
@@ -55,7 +57,7 @@ const ServicesTab: React.FC = () => {
                 quantity: 1,
               })
             }
-            className="p-4 bg-base-200 border border-base-content rounded-xl hover:border-primary hover:bg-primary/20 cursor-pointer flex  active:scale-95 transition-all justify-between items-center"
+            className="p-4 bg-base-200 rounded-xl hover:border-primary hover:bg-primary/20 cursor-pointer flex active:scale-95 transition-all justify-between items-center"
           >
             <span className="font-bold text-sm uppercase tracking-tight">
               {s.name}

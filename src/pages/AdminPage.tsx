@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Sidebar from "../components/navigations/Sidebar";
-
 import AdminSettings from "../components/Management/AdminSettings";
 import Dashboard from "../components/Management/Dashboard";
 import EmployeeManagement from "../components/Management/EmployeeManagement";
@@ -11,45 +10,39 @@ import ReportsManagement from "../components/Management/ReportsManagement";
 import ServiceManagement from "../components/Management/ServiceManagement";
 import { useAuthStore } from "../stores/authStore";
 
+
+export type TabKey =
+  | "Dashboard" | "Reports"  | "Products"
+  | "Services"  | "Packages" | "Expenses"
+  | "Employees" | "Settings";
+
 const AdminPage: React.FC = () => {
-  const adminLogout = useAuthStore((state) => state.adminLogout);
-  const [activeTab, setActiveTab] = useState("Dashboard");
+  const adminLogout = useAuthStore((s) => s.adminLogout);
+  const [activeTab, setActiveTab] = useState<TabKey>("Dashboard");
 
   const renderContent = () => {
     switch (activeTab) {
-      case "Employees":
-        return <EmployeeManagement />;
-      case "Services":
-        return <ServiceManagement />;
-      case "Products":
-        return <ProductManagement />;
-      case "Packages":
-        return <PackManagement />;
-      case "Expenses":
-        return <ExpenseManagement />;
-      case "Dashboard":
-        return <Dashboard />;
-      case "Reports":
-        return <ReportsManagement />;
-      case "Settings":
-        return <AdminSettings />;
-      default:
-        return <Dashboard />;
+      case "Dashboard":  return <Dashboard />;
+      case "Reports":    return <ReportsManagement />;
+      case "Products":   return <ProductManagement />;
+      case "Services":   return <ServiceManagement />;
+      case "Packages":   return <PackManagement />;
+      case "Expenses":   return <ExpenseManagement />;
+      case "Employees":  return <EmployeeManagement />;
+      case "Settings":   return <AdminSettings />;
+      default:           return <Dashboard />;
     }
   };
 
   return (
     <div className="h-screen bg-base-200 overflow-hidden">
-      {/* Fixed Sidebar */}
       <div className="fixed left-0 top-0 h-screen w-72">
         <Sidebar
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          setActiveTab={(tab) => setActiveTab(tab as TabKey)}
           onLogout={adminLogout}
         />
       </div>
-
-      {/* Main Content */}
       <main className="ml-72 h-screen overflow-y-auto p-8">
         <div
           key={activeTab}

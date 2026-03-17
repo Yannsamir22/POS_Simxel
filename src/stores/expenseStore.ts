@@ -54,11 +54,9 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
   addExpense: async (data) => {
     try {
       const res = await createExpense(data);
-      if (res.ok) {
-        set((state) => ({ expenses: [...state.expenses, res.data] }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.data ?? res.expense ?? res;
+      set((state) => ({ expenses: [...state.expenses, item] }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -70,15 +68,13 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
   editExpense: async (id, data) => {
     try {
       const res = await updateExpense(id, data);
-      if (res.ok) {
-        set((state) => ({
-          expenses: state.expenses.map((e) =>
-            e.id === id ? { ...e, ...res.data } : e,
-          ),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.data ?? res.expense ?? res;
+      set((state) => ({
+        expenses: state.expenses.map((e) =>
+          e.id === id ? { ...e, ...item } : e,
+        ),
+      }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -89,14 +85,11 @@ export const useExpenseStore = create<ExpenseState>((set) => ({
 
   removeExpense: async (id) => {
     try {
-      const res = await deleteExpense(id);
-      if (res.ok) {
-        set((state) => ({
-          expenses: state.expenses.filter((e) => e.id !== id),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      await deleteExpense(id);
+      set((state) => ({
+        expenses: state.expenses.filter((e) => e.id !== id),
+      }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,

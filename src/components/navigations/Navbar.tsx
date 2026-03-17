@@ -2,6 +2,7 @@ import { ChevronRight, LogOut, Menu, User, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
+import SyncIndicator from "../toggles/SyncIndicator";
 import ToggleLanguage from "../toggles/ToggleLanguage";
 import ToggleTheme from "../toggles/ToggleTheme";
 
@@ -35,7 +36,7 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto h-16 w-full flex items-center justify-between px-4 ">
         <div
           className="flex items-center gap-2 cursor-pointer"
-          onClick={() =>Navigate(accessLevel === "admin" ? "/admin" : "/")}
+          onClick={() => Navigate(accessLevel === "admin" ? "/admin" : "/")}
         >
           <figure className="h-10 w-10 flex items-center justify-center">
             <img
@@ -69,6 +70,8 @@ const Navbar: React.FC = () => {
             </button>
           )}
           <div className="flex items-center gap-2 border-l pl-4 border-base-300">
+            <SyncIndicator variant="dot" />
+
             <ToggleLanguage />
             <ToggleTheme />
           </div>

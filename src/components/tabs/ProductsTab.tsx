@@ -4,8 +4,10 @@ import Loading from "../../loadash/Loading";
 import { useProductStore } from "../../stores/productStore";
 import { useTicketStore } from "../../stores/useTicketStore";
 import SearchBar from "../SearchBar";
+import { useT } from "../../hooks/useT";
 
 const ProductsTab: React.FC = () => {
+  const {t} = useT();
   const { products, fetchProducts, loading } = useProductStore();
   const addItem = useTicketStore((state) => state.addItem);
   const [search, setSearch] = useState("");
@@ -27,12 +29,12 @@ const ProductsTab: React.FC = () => {
       {/* Search bar */}
       <div className="flex justify-between items-center px-10 border-b border-base-300 py-4">
         <h1 className="uppercase tracking-tighter font-extrabold">
-          Product Sale
+          {t("pos.productSale")}
         </h1>
         <SearchBar
           value={search}
           onChange={setSearch}
-          placeholder="Search products..."
+          placeholder={t("pos.searchProducts")}
         />
       </div>
 
@@ -40,13 +42,13 @@ const ProductsTab: React.FC = () => {
       {filteredProducts.length === 0 && (
         <div className="flex-1 flex items-center justify-center opacity-30">
           <p className="font-black uppercase tracking-widest text-sm">
-            {search ? "No results" : "No products yet"}
+            {search ? t("pos.noResults"): t("pos.noProducts")}
           </p>
         </div>
       )}
 
       {/* Product list */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-20 ">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-15 ">
         {filteredProducts.map((p) => {
           const outOfStock = p.stock <= 0;
           const lowStock = p.stock > 0 && p.stock <= (p.minStockAlert ?? 5);
@@ -63,7 +65,7 @@ const ProductsTab: React.FC = () => {
                   quantity: 1,
                 });
               }}
-              className={`p-4 bg-base-200 rounded-xl border-base-content border flex flex-col gap-1 transition-all
+              className={`p-4 bg-base-200 rounded-xl   flex flex-col gap-1 transition-all
                 ${
                   outOfStock
                     ? "opacity-40 cursor-not-allowed"
@@ -89,7 +91,7 @@ const ProductsTab: React.FC = () => {
                         : "bg-success/10 text-success"
                   }`}
               >
-                {outOfStock ? "Out of stock" : `${p.stock} in stock`}
+                {outOfStock ?t("products.outOfStock") :`${p.stock} ${t("products.inStock")}`}
               </span>
             </div>
           );

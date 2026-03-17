@@ -6,6 +6,8 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 
+  base: "./",
+
   server: {
     proxy: {
       "/api": {
@@ -14,5 +16,9 @@ export default defineConfig({
         secure: false,
       },
     },
+  },
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
   },
 });

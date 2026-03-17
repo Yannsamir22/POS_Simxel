@@ -1,35 +1,54 @@
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useT } from "../../hooks/useT";
+import { useToastStore } from "../../stores/toastStore";
+import type { Expense } from "../../stores/expenseStore";
 
-const EXPENSE_TYPES = [
-  "Rent",
-  "Electricity",
-  "Water",
-  "Supplies",
-  "Salary",
-  "Transport",
-  "Maintenance",
-  "Marketing",
-  "Other",
-];
 
-const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
-  const [type, setType] = useState(initial?.type ?? "");
-  const [amount, setAmount] = useState(initial?.amount ?? "");
-  const [note, setNote] = useState(initial?.note ?? "");
-  const [date, setDate] = useState(
+interface ExpenseFormProps {
+  open: boolean;
+  initial?: Expense | null;
+  onClose: () => void;
+  onSubmit: (payload: {
+    type: string;
+    amount: number;
+    note?: string;
+    date: string;
+  }) => Promise<{ success: boolean; error?: string } | void>;
+}
+
+
+const EXPENSE_TYPE_KEYS = [
+  "Rent", "Electricity", "Water", "Supplies",
+  "Salary", "Transport", "Maintenance", "Marketing", "Other",
+] as const;
+
+const ExpenseForm: React.FC<ExpenseFormProps> = ({
+  open,
+  onClose,
+  onSubmit,
+  initial,
+}) => {
+  const { t } = useT();
+  const addToast = useToastStore((s: any) => s.addToast);
+
+  const [type,    setType]    = useState(initial?.type ?? "");
+  const [amount,  setAmount]  = useState<string>(initial?.amount?.toString() ?? "");
+  const [note,    setNote]    = useState(initial?.note ?? "");
+  const [date,    setDate]    = useState(
     initial?.date
       ? new Date(initial.date).toISOString().slice(0, 10)
       : new Date().toISOString().slice(0, 10),
   );
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  // Reset form when the modal opens for a new expense
+  const [error,   setError]   = useState<string | null>(null);
+
+  // Reset when modal opens
   useEffect(() => {
     if (open) {
       setType(initial?.type ?? "");
-      setAmount(initial?.amount ?? "");
+      setAmount(initial?.amount?.toString() ?? "");
       setNote(initial?.note ?? "");
       setDate(
         initial?.date
@@ -42,52 +61,57 @@ const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
 
   if (!open) return null;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     const parsedAmount = parseFloat(amount);
-    if (!type.trim()) return setError("Please select an expense type.");
-    if (isNaN(parsedAmount) || parsedAmount <= 0)
-      return setError("Please enter a valid amount.");
+    if (!type.trim())                       return setError("Please select an expense type.");
+    if (isNaN(parsedAmount) || parsedAmount <= 0) return setError("Please enter a valid amount.");
 
     setLoading(true);
     try {
-      await onSubmit({
+      const result = await onSubmit({
         type: type.trim(),
         amount: parsedAmount,
         note: note.trim() || undefined,
         date,
       });
-      onClose();
-    } catch (err) {
-      setError(
-        err?.response?.data?.error ?? err?.message ?? "Failed to save expense.",
+
+      if (result && !result.success) {
+        setError(result.error ?? "Failed to save expense.");
+        return;
+      }
+
+      addToast(
+        initial ? "Expense updated" : "Expense added",
+        "success",
       );
+      onClose();
+    } catch (err: any) {
+      setError(err?.response?.data?.error ?? err?.message ?? "Failed to save expense.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    /* Backdrop */
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
-      {/* Modal panel */}
       <div
         className="bg-base-100 rounded-2xl shadow-2xl border border-base-300 w-full max-w-md mx-4 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {/* Header — fix: hardcoded English, now uses t() */}
         <div className="flex items-center justify-between p-5 border-b border-base-300 bg-base-200">
           <div className="border-l-4 border-error pl-4">
             <h3 className="font-black uppercase text-sm tracking-tight">
-              {initial ? "Edit Expense" : "New Expense"}
+              {initial ? t("common.edit") : t("expenses.addExpense")}
             </h3>
             <p className="text-[10px] opacity-50 font-bold uppercase tracking-widest">
-              Cash Outflow Record
+              {t("expenses.subtitle")}
             </p>
           </div>
           <button onClick={onClose} className="btn btn-ghost btn-sm btn-circle">
@@ -95,25 +119,24 @@ const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          {/* Type */}
+          {/* Type — fix: option value was translated text, now stable English key */}
           <div className="form-control">
             <label className="label">
               <span className="label-text text-[10px] font-black uppercase tracking-widest opacity-50">
-                Expense Type *
+                {t("expenses.type")} *
               </span>
             </label>
             <select
-              className="select select-bordered w-full"
+              className={`select select-bordered w-full ${error && !type ? "select-error" : ""}`}
               value={type}
-              onChange={(e) => setType(e.target.value)}
+              onChange={(e) => { setType(e.target.value); setError(null); }}
               required
             >
               <option value="">Select a type…</option>
-              {EXPENSE_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
+              {EXPENSE_TYPE_KEYS.map((key) => (
+                <option key={key} value={key}>
+                  {t(`expenses.types.${key}`)}
                 </option>
               ))}
             </select>
@@ -123,7 +146,7 @@ const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
           <div className="form-control">
             <label className="label">
               <span className="label-text text-[10px] font-black uppercase tracking-widest opacity-50">
-                Amount (FCFA) *
+                {t("common.amount")} (FCFA) *
               </span>
             </label>
             <input
@@ -132,8 +155,8 @@ const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
               step={1}
               placeholder="e.g. 5000"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="input input-bordered w-full font-black text-lg"
+              onChange={(e) => { setAmount(e.target.value); setError(null); }}
+              className={`input input-bordered w-full font-black text-lg ${error && !amount ? "input-error" : ""}`}
               required
             />
           </div>
@@ -142,7 +165,7 @@ const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
           <div className="form-control">
             <label className="label">
               <span className="label-text text-[10px] font-black uppercase tracking-widest opacity-50">
-                Date *
+                {t("common.date")} *
               </span>
             </label>
             <input
@@ -154,11 +177,11 @@ const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
             />
           </div>
 
-          {/* Note (optional) */}
+          {/* Note */}
           <div className="form-control">
             <label className="label">
               <span className="label-text text-[10px] font-black uppercase tracking-widest opacity-50">
-                Note (optional)
+                {t("common.note")}
               </span>
             </label>
             <input
@@ -171,17 +194,15 @@ const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
             />
           </div>
 
-          {/* Error */}
           {error && <p className="text-error font-bold text-sm">{error}</p>}
 
-          {/* Actions */}
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
               className="btn btn-ghost flex-1 rounded-lg uppercase font-bold text-xs"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -191,9 +212,9 @@ const ExpenseForm = ({ open, onClose, onSubmit, initial }) => {
               {loading ? (
                 <span className="loading loading-spinner loading-xs" />
               ) : initial ? (
-                "Save Changes"
+                t("common.save")
               ) : (
-                "Add Expense"
+                t("expenses.addExpense")
               )}
             </button>
           </div>

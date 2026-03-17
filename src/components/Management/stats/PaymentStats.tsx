@@ -1,5 +1,6 @@
 import React from "react";
 import { Banknote, Smartphone, CreditCard, Phone } from "lucide-react";
+import { useT } from "../../../hooks/useT";
 
 interface PaymentBreakdown {
   CASH: number;
@@ -45,11 +46,12 @@ const METHOD_CONFIG = [
 
 const PaymentStats: React.FC<PaymentStatsProps> = ({ payments }) => {
   const total = Object.values(payments).reduce((s, v) => s + (v ?? 0), 0);
+  const {t} = useT()
 
   return (
     <div className="bg-base-200 rounded-xl border border-base-300 p-6 shadow-sm">
       <p className="text-[10px] font-black uppercase opacity-50 tracking-[0.3em] mb-5">
-        Payment Methods
+        {t("dashboard.payments")}
       </p>
 
       <div className="space-y-4">
@@ -89,7 +91,7 @@ const PaymentStats: React.FC<PaymentStatsProps> = ({ payments }) => {
       {/* Total */}
       <div className="mt-5 pt-4 border-t border-base-300 flex justify-between items-center">
         <span className="text-xs font-black uppercase opacity-50 tracking-widest">
-          Total Collected
+          {t("dashboard.totalCollected")}
         </span>
         <span className="text-lg font-black text-primary">
           {total.toLocaleString()}

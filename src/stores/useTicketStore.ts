@@ -77,7 +77,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   pendingTickets: [],
   selectedPendingIndex: null,
 
-  // ─── ADD ITEM 
+  // sADD ITEM 
   addItem: (item) =>
     set((state) => {
       const existing = state.currentTicket.items.find((i) => i.id === item.id);
@@ -101,7 +101,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       };
     }),
 
-  // ─── REMOVE ITEM 
+  // sREMOVE ITEM 
   removeItem: (id) =>
     set((state) => {
       const items = state.currentTicket.items.filter((i) => i.id !== id);
@@ -110,7 +110,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       };
     }),
 
-  // ─── UPDATE QTY 
+  // sUPDATE QTY 
   updateQty: (id, qty) =>
     set((state) => {
       if (qty <= 0) {
@@ -126,10 +126,10 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       };
     }),
 
-  // ─── CLEAR TICKET 
+  // sCLEAR TICKET 
   clearTicket: () => set({ currentTicket: freshTicket() }),
 
-  // ─── PARK / LOAD 
+  // sPARK / LOAD 
   parkTicket: () =>
     set((state) => ({
       pendingTickets: [...state.pendingTickets, { ...state.currentTicket }],
@@ -152,7 +152,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       selectedPendingIndex: null,
     })),
 
-  // ─── PAYMENTS ─────────────────────────────────────────────────────────────
+  // sPAYMENTS ───────
   addPayment: (payment) =>
     set((state) => ({
       currentTicket: {
@@ -166,7 +166,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       currentTicket: { ...state.currentTicket, payments: [] },
     })),
 
-  // ─── CONFIRM TICKET ───────────────────────────────────────────────────────
+  // sCONFIRM TICKET ─
   confirmTicket: async () => {
     const ticket = get().currentTicket;
 
@@ -217,7 +217,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
     }
   },
 
-  // ─── ASSIGN EMPLOYEE ──────────────────────────────────────────────────────
+  // sASSIGN EMPLOYEE 
   assignEmployee: (itemId, employeeId) =>
     set((state) => ({
       currentTicket: {

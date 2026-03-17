@@ -65,11 +65,9 @@ export const useProductStore = create<ProductState>((set) => ({
   addProduct: async (data) => {
     try {
       const res = await createProduct(data);
-      if (res.ok) {
-        set((state) => ({ products: [...state.products, res.data] }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.data ?? res.product ?? res;
+      set((state) => ({ products: [...state.products, item] }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -81,15 +79,13 @@ export const useProductStore = create<ProductState>((set) => ({
   editProduct: async (id, data) => {
     try {
       const res = await updateProduct(id, data);
-      if (res.ok) {
-        set((state) => ({
-          products: state.products.map((p) =>
-            p.id === id ? { ...p, ...res.data } : p,
-          ),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.data ?? res.product ?? res;
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.id === id ? { ...p, ...item } : p,
+        ),
+      }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -100,14 +96,9 @@ export const useProductStore = create<ProductState>((set) => ({
 
   removeProduct: async (id) => {
     try {
-      const res = await deleteProduct(id);
-      if (res.ok) {
-        set((state) => ({
-          products: state.products.filter((p) => p.id !== id),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      await deleteProduct(id);
+      set((state) => ({ products: state.products.filter((p) => p.id !== id) }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -119,15 +110,13 @@ export const useProductStore = create<ProductState>((set) => ({
   adjustStock: async (id, quantity) => {
     try {
       const res = await adjustProductStock(id, quantity);
-      if (res.ok) {
-        set((state) => ({
-          products: state.products.map((p) =>
-            p.id === id ? { ...p, ...res.data } : p,
-          ),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.data ?? res.product ?? res;
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.id === id ? { ...p, ...item } : p,
+        ),
+      }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,

@@ -1,10 +1,68 @@
 import { Edit2, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useT } from "../../hooks/useT";
 import Loading from "../../loadash/Loading";
-import { useServiceStore } from "../../stores/serviceStore";
+import { useServiceStore, type Service } from "../../stores/serviceStore";
+import ManagementModal, {
+  SERVICE_FIELDS,
+  type ModalMode,
+} from "./ManagementModal";
+import { useToastStore } from "../../stores/toastStore";
 
 const ServiceManagement = () => {
-  const { services, fetchServices, loading } = useServiceStore();
-  if (loading) return <Loading message="Loading services..." />;
+  const { t } = useT();
+  const addToast = useToastStore((s: any) => s.addToast);
+
+  const {
+    services,
+    fetchServices,
+    addService,
+    editService,
+    removeService,
+    loading,
+  } = useServiceStore();
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [mode, setMode] = useState<ModalMode>("create");
+  const [target, setTarget] = useState<Service | null>(null);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
+
+  const openCreate = () => {
+    setTarget(null);
+    setMode("create");
+    setModalOpen(true);
+  };
+  const openEdit = (s: Service) => {
+    setTarget(s);
+    setMode("edit");
+    setModalOpen(true);
+  };
+  const openDelete = (s: Service) => {
+    setTarget(s);
+    setMode("delete");
+    setModalOpen(true);
+  };
+
+  const handleCreate = async (data: any) => {
+    const result = await addService(data);
+    if (result.success) addToast(t("services.addService") + " ✓", "success");
+    return result;
+  };
+  const handleEdit = async (data: any) => {
+    const result = await editService(target!.id, data);
+    if (result.success) addToast(t("common.save") + " ✓", "success");
+    return result;
+  };
+  const handleDelete = async () => {
+    const result = await removeService(target!.id);
+    if (result.success) addToast("Service deleted", "success");
+    return result;
+  };
+
+  if (loading) return <Loading message={t("services.title") + "…"} />;
 
   return (
     <div className="space-y-6">
@@ -13,16 +71,18 @@ const ServiceManagement = () => {
           <div className="absolute left-4 top-8 bottom-8 w-px bg-primary" />
           <div className="pl-6">
             <h3 className="text-xl font-black uppercase tracking-tighter">
-              Service Panel
+              {t("services.title")}
             </h3>
             <p className="text-[10px] font-bold text-base-content/50 uppercase tracking-[0.3em]">
-              Service Management
+              {t("services.subtitle")}
             </p>
           </div>
           <button
+            onClick={openCreate}
             className="btn btn-primary btn-sm rounded-sm font-bold gap-2 uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20"
           >
-            <Plus size={16} /> Add service
+            <Plus size={16} />
+            {t("services.addService")}
           </button>
         </div>
 
@@ -30,38 +90,67 @@ const ServiceManagement = () => {
           <table className="table w-full">
             <thead>
               <tr className="bg-base-300/50 border-b border-base-300 text-[10px] uppercase tracking-widest opacity-50">
-                <th className="pl-10">Name</th>
-                <th className="text-center">Price</th>
-                <th className="text-right pr-10">Actions</th>
+                <th className="pl-10">{t("common.name")}</th>
+                <th className="text-center">{t("common.price")}</th>
+                <th className="text-right pr-10">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
-              {services.map((service) => (
-                <tr
-                  key={service.id}
-                  className="hover:bg-base-300/30 transition-colors border-b border-base-300/50"
-                >
-                  <td className="pl-10 font-bold text-sm uppercase tracking-tight">
-                    {service.name}
-                  </td>
-                  <td className="pl-10 justify-center flex font-bold text-sm uppercase tracking-tight ">
-                    {service.price} FCFA
-                  </td>
-                  
-                  <td className="text-right pr-10 space-x-2">
-                    <button className="btn btn-ghost btn-xs hover:text-primary">
-                      <Edit2 size={14} />
-                    </button>
-                    <button className="btn btn-ghost btn-xs hover:text-error">
-                      <Trash2 size={14} />
-                    </button>
+              {services.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="text-center py-12 opacity-20 font-black uppercase tracking-widest text-sm"
+                  >
+                    {t("services.noServices")}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                services.map((service) => (
+                  <tr
+                    key={service.id}
+                    className="hover:bg-base-300/30 transition-colors border-b border-base-300/50"
+                  >
+                    <td className="pl-10 font-bold text-sm uppercase tracking-tight">
+                      {service.name}
+                    </td>
+                    <td className="pl-10 justify-center flex font-bold text-sm uppercase tracking-tight ">
+                      {service.price.toLocaleString()} FCFA
+                    </td>
+
+                    <td className="text-right pr-10 space-x-2">
+                      <button
+                        onClick={() => openEdit(service)}
+                        className="btn btn-ghost btn-xs hover:text-primary"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button
+                        onClick={() => openDelete(service)}
+                        className="btn btn-ghost btn-xs hover:text-error"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Modal */}
+      <ManagementModal
+        open={modalOpen}
+        mode={mode}
+        onClose={() => setModalOpen(false)}
+        fields={SERVICE_FIELDS}
+        entityName="Service"
+        accentColor="primary"
+        initial={target ?? undefined}
+        onCreate={handleCreate} onEdit={handleEdit} onDelete={handleDelete}
+      />
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import {
-  createService,
-  deleteService,
   fetchServices,
+  createService,
   updateService,
+  deleteService,
 } from "../services/serviceService";
 
 export interface Service {
@@ -24,7 +24,7 @@ type ServiceState = {
   }) => Promise<{ success: boolean; error?: string }>;
   editService: (
     id: string,
-    data: { name?: string; price?: number },
+    data: { name?: string; price?: number }
   ) => Promise<{ success: boolean; error?: string }>;
   removeService: (id: string) => Promise<{ success: boolean; error?: string }>;
 };
@@ -38,6 +38,7 @@ export const useServiceStore = create<ServiceState>((set) => ({
     set({ loading: true, error: null });
     try {
       const res = await fetchServices();
+      // Backend shape: { ok: true, data: Service[] }
       set({ services: res.data ?? [], loading: false });
     } catch (error: any) {
       const msg = error.response?.data?.error ?? "Failed to fetch services";
@@ -49,11 +50,9 @@ export const useServiceStore = create<ServiceState>((set) => ({
   addService: async (data) => {
     try {
       const res = await createService(data);
-      if (res.ok) {
-        set((state) => ({ services: [...state.services, res.data] }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.data ?? res.service ?? res;
+      set((state) => ({ services: [...state.services, item] }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -65,15 +64,11 @@ export const useServiceStore = create<ServiceState>((set) => ({
   editService: async (id, data) => {
     try {
       const res = await updateService(id, data);
-      if (res.ok) {
-        set((state) => ({
-          services: state.services.map((s) =>
-            s.id === id ? { ...s, ...res.data } : s,
-          ),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.data ?? res.service ?? res;
+      set((state) => ({
+        services: state.services.map((s) => s.id === id ? { ...s, ...item } : s),
+      }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -84,14 +79,9 @@ export const useServiceStore = create<ServiceState>((set) => ({
 
   removeService: async (id) => {
     try {
-      const res = await deleteService(id);
-      if (res.ok) {
-        set((state) => ({
-          services: state.services.filter((s) => s.id !== id),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      await deleteService(id);
+      set((state) => ({ services: state.services.filter((s) => s.id !== id) }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,

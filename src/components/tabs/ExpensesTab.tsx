@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useExpenseStore } from "../../stores/expenseStore";
-import Loading from "../../loadash/Loading";
-import ExpenseForm from "../forms/ExpenseForm";
 import { Plus, Receipt } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useT } from "../../hooks/useT";
+import Loading from "../../loadash/Loading";
+import { useExpenseStore } from "../../stores/expenseStore";
+import ExpenseForm from "../forms/ExpenseForm";
 
 const ExpensesTab: React.FC = () => {
+  const { t } = useT();
   const { expenses, fetchExpenses, addExpense, loading } = useExpenseStore();
   const [formOpen, setFormOpen] = useState(false);
 
-  useEffect(() => { fetchExpenses(); }, [fetchExpenses]);
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
 
   if (loading) return <Loading message="Loading Expenses..." />;
 
@@ -25,7 +29,9 @@ const ExpensesTab: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center px-6 border-b border-base-300 py-4">
         <div>
-          <h1 className="uppercase tracking-tighter font-extrabold">Expenses</h1>
+          <h1 className="uppercase tracking-tighter font-extrabold">
+            Expenses
+          </h1>
           {todayTotal > 0 && (
             <p className="text-[10px] opacity-50 font-bold">
               Today: {todayTotal.toLocaleString()} FCFA
@@ -44,7 +50,9 @@ const ExpensesTab: React.FC = () => {
       {expenses.length === 0 && (
         <div className="flex-1 flex flex-col items-center justify-center opacity-20 gap-3">
           <Receipt size={48} />
-          <p className="font-black uppercase tracking-widest text-sm">No expenses</p>
+          <p className="font-black uppercase tracking-widest text-sm">
+            No expenses
+          </p>
         </div>
       )}
 
@@ -56,7 +64,9 @@ const ExpensesTab: React.FC = () => {
             className="flex justify-between items-center p-3 bg-base-200 rounded-md border border-base-300"
           >
             <div className="flex flex-col">
-              <span className="font-bold text-sm uppercase">{expense.type}</span>
+              <span className="font-bold text-sm uppercase">
+                {expense.type}
+              </span>
               {expense.note && (
                 <span className="text-xs opacity-50">{expense.note}</span>
               )}
@@ -75,8 +85,11 @@ const ExpensesTab: React.FC = () => {
       <ExpenseForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
-        onSubmit={async (data) => { await addExpense(data); }}
+        onSubmit={async (data: { type: string; amount: number; note?: string; date?: string; }) => {
+          await addExpense(data);
+        }}
         initial={null}
+        t={t}
       />
     </div>
   );

@@ -4,7 +4,7 @@
   themes: simxel, simxel-dark;
 }
 
-/* ─── Light theme ─────────────────────────────────────────────────────────── */
+/* Light theme */
 @plugin "daisyui/theme" {
   name: "simxel";
   default: true;
@@ -48,7 +48,7 @@
   --radius-box: 0.75rem;
 }
 
-/* ─── Dark theme ──────────────────────────────────────────────────────────── */
+/* Dark theme  */
 @plugin "daisyui/theme" {
   name: "simxel-dark";
   color-scheme: dark;
@@ -91,7 +91,7 @@
   --radius-box: 0.75rem;
 }
 
-/* ─── Global resets ───────────────────────────────────────────────────────── */
+/* Global resets */
 * {
   @apply font-sans;
   -ms-overflow-style: none;

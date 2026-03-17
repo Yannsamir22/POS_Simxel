@@ -63,7 +63,7 @@ export const usePackageStore = create<PackageState>((set) => ({
     try {
       const res = await fetchPackages();
       // Backend shape: { ok: true, packages: Package[] }
-      const raw: any[] = res.packages ?? [];
+      const raw: any[] = res.packages ?? res.data ?? [];
       set({ packages: raw.map(normalize), loading: false });
     } catch (error: any) {
       const msg = error.response?.data?.error ?? "Failed to fetch packages";
@@ -75,13 +75,9 @@ export const usePackageStore = create<PackageState>((set) => ({
   addPackage: async (data) => {
     try {
       const res = await createPackage(data);
-      if (res.ok) {
-        set((state) => ({
-          packages: [...state.packages, normalize(res.package)],
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const raw = res.package ?? res.data ?? res;
+      set((state) => ({ packages: [...state.packages, normalize(raw)] }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -93,15 +89,11 @@ export const usePackageStore = create<PackageState>((set) => ({
   editPackage: async (id, data) => {
     try {
       const res = await updatePackage(id, data);
-      if (res.ok) {
-        set((state) => ({
-          packages: state.packages.map((p) =>
-            p.id === id ? normalize(res.package) : p
-          ),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const raw = res.package ?? res.data ?? res;
+      set((state) => ({
+        packages: state.packages.map((p) => p.id === id ? normalize(raw) : p),
+      }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -112,14 +104,9 @@ export const usePackageStore = create<PackageState>((set) => ({
 
   removePackage: async (id) => {
     try {
-      const res = await deletePackage(id);
-      if (res.ok) {
-        set((state) => ({
-          packages: state.packages.filter((p) => p.id !== id),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      await deletePackage(id);
+      set((state) => ({ packages: state.packages.filter((p) => p.id !== id) }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,

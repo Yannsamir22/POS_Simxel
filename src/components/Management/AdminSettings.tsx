@@ -28,7 +28,7 @@ function resolveAndApply(choice: ThemeChoice) {
   localStorage.setItem("theme", choice);
 }
 
-//  SVG mini-screen previews (hardcoded colours — they are illustrations) 
+//  SVG mini-screen previews (hardcoded colours — they are illustrations)
 const BLUE = "#0197f6";
 const GREEN = "#16a34a";
 
@@ -179,11 +179,12 @@ const SystemPreview: React.FC = () => (
   </svg>
 );
 
-//  Component 
+//  Component
 const AdminSettings: React.FC = () => {
   const { t } = useT();
   const { language, setLanguage } = useLanguageStore();
   const changeAdminPassword = useAuthStore((s) => s.changeAdminPassword);
+  const changeManagerPassword = useAuthStore((s) => s.changeManagerPassword);
 
   const [theme, setThemeState] = useState<ThemeChoice>(
     () => (localStorage.getItem("theme") as ThemeChoice) ?? "system",
@@ -193,35 +194,73 @@ const AdminSettings: React.FC = () => {
     resolveAndApply(v);
   };
 
-  const [oldPass, setOldPass] = useState("");
-  const [newPass, setNewPass] = useState("");
-  const [confPass, setConfPass] = useState("");
-  const [pwdLoading, setPwdLoading] = useState(false);
-  const [pwdMsg, setPwdMsg] = useState<{ ok: boolean; text: string } | null>(
-    null,
-  );
+  // Manager password change
 
-  const handlePasswordChange = async (e: React.FormEvent) => {
+  const [oldManagerPass, setOldManagerPass] = useState("");
+  const [newManagerPass, setNewManagerPass] = useState("");
+  const [confManagerPass, setConfManagerPass] = useState("");
+  const [pwdManagerLoading, setPwdManagerLoading] = useState(false);
+  const [pwdManagerMsg, setPwdManagerMsg] = useState<{
+    ok: boolean;
+    text: string;
+  } | null>(null);
+
+  const handleManagerPasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPwdMsg(null);
-    if (newPass.length < 4) {
-      setPwdMsg({ ok: false, text: t("settings.passShort") });
+    setPwdManagerMsg(null);
+    if (newManagerPass.length < 4) {
+      setPwdManagerMsg({ ok: false, text: t("settings.passShort") });
       return;
     }
-    if (newPass !== confPass) {
-      setPwdMsg({ ok: false, text: t("settings.passMismatch") });
+    if (newManagerPass !== confManagerPass) {
+      setPwdManagerMsg({ ok: false, text: t("settings.passMismatch") });
       return;
     }
-    setPwdLoading(true);
-    const res = await changeAdminPassword(oldPass, newPass);
-    setPwdLoading(false);
+    setPwdManagerLoading(true);
+    const res = await changeManagerPassword(oldManagerPass, newManagerPass);
+    setPwdManagerLoading(false);
     if (res.success) {
-      setPwdMsg({ ok: true, text: t("settings.passSuccess") });
-      setOldPass("");
-      setNewPass("");
-      setConfPass("");
+      setPwdManagerMsg({ ok: true, text: t("settings.passSuccess") });
+      setOldManagerPass("");
+      setNewManagerPass("");
+      setConfManagerPass("");
     } else {
-      setPwdMsg({ ok: false, text: res.error ?? t("common.error") });
+      setPwdManagerMsg({ ok: false, text: res.error ?? t("common.error") });
+    }
+  };
+
+  // Admin password change
+
+  const [oldAdminPass, setOldAdminPass] = useState("");
+  const [newAdminPass, setNewAdminPass] = useState("");
+  const [confAdminPass, setConfAdminPass] = useState("");
+  const [pwdAdminLoading, setPwdAdminLoading] = useState(false);
+  const [pwdAdminMsg, setPwdAdminMsg] = useState<{
+    ok: boolean;
+    text: string;
+  } | null>(null);
+
+  const handleAdminPasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwdAdminMsg(null);
+    if (newAdminPass.length < 4) {
+      setPwdAdminMsg({ ok: false, text: t("settings.passShort") });
+      return;
+    }
+    if (newAdminPass !== confAdminPass) {
+      setPwdAdminMsg({ ok: false, text: t("settings.passMismatch") });
+      return;
+    }
+    setPwdAdminLoading(true);
+    const res = await changeAdminPassword(oldAdminPass, newAdminPass);
+    setPwdAdminLoading(false);
+    if (res.success) {
+      setPwdAdminMsg({ ok: true, text: t("settings.passSuccess") });
+      setOldAdminPass("");
+      setNewAdminPass("");
+      setConfAdminPass("");
+    } else {
+      setPwdAdminMsg({ ok: false, text: res.error ?? t("common.error") });
     }
   };
 
@@ -256,7 +295,7 @@ const AdminSettings: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 max-w-2xl animate-in fade-in duration-300">
+    <div className="space-y-6 w-full animate-in fade-in duration-300">
       {/* Header */}
       <div className="border-l-4 border-primary pl-5">
         <h2 className="text-2xl font-black uppercase tracking-tighter leading-tight">
@@ -361,6 +400,7 @@ const AdminSettings: React.FC = () => {
 
       {/*  Security  */}
       <section className="bg-base-200 rounded-xl border border-base-300 overflow-hidden">
+        {/*Change Admin Password form*/}
         <div className="p-5 border-b border-base-300 flex items-center gap-3">
           <Lock size={16} className="text-primary" />
           <div>
@@ -368,58 +408,132 @@ const AdminSettings: React.FC = () => {
               {t("settings.security")}
             </h3>
             <p className="text-[10px] opacity-50 font-bold uppercase tracking-widest">
-              {t("settings.changePass")}
+              {t("settings.changeAdminPass")}
             </p>
           </div>
         </div>
-        <form onSubmit={handlePasswordChange} className="p-5 space-y-4">
+
+        <form onSubmit={handleAdminPasswordChange} className="p-5 space-y-4">
           <div className="space-y-3">
             <input
               type="password"
               placeholder={t("settings.currentPass")}
-              value={oldPass}
-              onChange={(e) => setOldPass(e.target.value)}
+              value={oldAdminPass}
+              onChange={(e) => setOldAdminPass(e.target.value)}
               className="input input-bordered w-full"
               required
             />
             <input
               type="password"
               placeholder={t("settings.newPass")}
-              value={newPass}
-              onChange={(e) => setNewPass(e.target.value)}
+              value={newAdminPass}
+              onChange={(e) => setNewAdminPass(e.target.value)}
               className="input input-bordered w-full"
               required
             />
             <input
               type="password"
               placeholder={t("settings.confirmPass")}
-              value={confPass}
-              onChange={(e) => setConfPass(e.target.value)}
+              value={confAdminPass}
+              onChange={(e) => setConfAdminPass(e.target.value)}
               className={`input input-bordered w-full ${
-                confPass && confPass !== newPass ? "input-error" : ""
+                confAdminPass && confAdminPass !== newAdminPass
+                  ? "input-error"
+                  : ""
               }`}
               required
             />
           </div>
-          {pwdMsg && (
+          {pwdAdminMsg && (
             <div
               className={`flex items-center gap-2 text-sm font-bold p-3 rounded-lg
-              ${pwdMsg.ok ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}
+              ${pwdAdminMsg.ok ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}
             >
-              {pwdMsg.ok ? (
+              {pwdAdminMsg.ok ? (
                 <CheckCircle size={16} />
               ) : (
                 <AlertCircle size={16} />
               )}
-              {pwdMsg.text}
+              {pwdAdminMsg.text}
             </div>
           )}
           <button
             type="submit"
-            disabled={pwdLoading}
+            disabled={pwdAdminLoading}
             className="btn btn-primary btn-sm rounded-lg font-bold uppercase tracking-widest"
           >
-            {pwdLoading ? (
+            {pwdAdminLoading ? (
+              <span className="loading loading-spinner loading-xs" />
+            ) : (
+              t("settings.updatePass")
+            )}
+          </button>
+        </form>
+      </section>
+
+      {/* Change Cashier Password form */}
+      <section className="bg-base-200 rounded-xl border border-base-300 overflow-hidden">
+        <div className="p-5 border-b border-base-300 flex items-center gap-3">
+          <Lock size={16} className="text-primary" />
+          <div>
+            <h3 className="font-black uppercase text-sm tracking-tight">
+              {t("settings.security")}
+            </h3>
+            <p className="text-[10px] opacity-50 font-bold uppercase tracking-widest">
+              {t("settings.changeManagerPass")}
+            </p>
+          </div>
+        </div>
+        <form onSubmit={handleManagerPasswordChange} className="p-5 space-y-4">
+          <div className="space-y-3">
+            <input
+              type="password"
+              placeholder={t("settings.currentPass")}
+              value={oldManagerPass}
+              onChange={(e) => setOldManagerPass(e.target.value)}
+              className="input input-bordered w-full"
+              required
+            />
+            <input
+              type="password"
+              placeholder={t("settings.newPass")}
+              value={newManagerPass}
+              onChange={(e) => setNewManagerPass(e.target.value)}
+              className="input input-bordered w-full"
+              required
+            />
+            <input
+              type="password"
+              placeholder={t("settings.confirmPass")}
+              value={confManagerPass}
+              onChange={(e) => setConfManagerPass(e.target.value)}
+              className={`input input-bordered w-full ${
+                confManagerPass && confManagerPass !== newManagerPass
+                  ? "input-error"
+                  : ""
+              }`}
+              required
+            />
+          </div>
+          {pwdManagerMsg && (
+            <div
+              className={`flex items-center gap-2 text-sm font-bold p-3 rounded-lg
+              ${pwdManagerMsg.ok ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}
+            >
+              {pwdManagerMsg.ok ? (
+                <CheckCircle size={16} />
+              ) : (
+                <AlertCircle size={16} />
+              )}
+              {pwdManagerMsg.text}
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={pwdManagerLoading}
+            className="btn btn-primary btn-sm rounded-lg font-bold uppercase tracking-widest"
+          >
+            {pwdManagerLoading ? (
               <span className="loading loading-spinner loading-xs" />
             ) : (
               t("settings.updatePass")

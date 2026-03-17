@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import {
-  getEmployees,
   createEmployee,
-  updateEmployee,
   deleteEmployee,
+  getEmployees,
+  updateEmployee,
 } from "../services/employeeService";
 
 export interface Employee {
@@ -33,7 +33,7 @@ interface EmployeeState {
       role?: string;
       dateOfBirth?: string;
       commissionRate?: number;
-    }
+    },
   ) => Promise<{ success: boolean; error?: string }>;
   removeEmployee: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
@@ -59,11 +59,9 @@ export const useEmployeeStore = create<EmployeeState>((set) => ({
   addEmployee: async (data) => {
     try {
       const res = await createEmployee(data);
-      if (res.ok) {
-        set((state) => ({ employees: [...state.employees, res.user] }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.user ?? res.data ?? res;
+      set((state) => ({ employees: [...state.employees, item] }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -75,15 +73,13 @@ export const useEmployeeStore = create<EmployeeState>((set) => ({
   editEmployee: async (id, data) => {
     try {
       const res = await updateEmployee(id, data);
-      if (res.ok) {
-        set((state) => ({
-          employees: state.employees.map((e) =>
-            e.id === id ? { ...e, ...res.user } : e
-          ),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      const item = res.user ?? res.data ?? res;
+      set((state) => ({
+        employees: state.employees.map((e) =>
+          e.id === id ? { ...e, ...item } : e,
+        ),
+      }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,
@@ -94,14 +90,11 @@ export const useEmployeeStore = create<EmployeeState>((set) => ({
 
   removeEmployee: async (id) => {
     try {
-      const res = await deleteEmployee(id);
-      if (res.ok) {
-        set((state) => ({
-          employees: state.employees.filter((e) => e.id !== id),
-        }));
-        return { success: true };
-      }
-      return { success: false, error: res.error };
+      await deleteEmployee(id);
+      set((state) => ({
+        employees: state.employees.filter((e) => e.id !== id),
+      }));
+      return { success: true };
     } catch (error: any) {
       return {
         success: false,

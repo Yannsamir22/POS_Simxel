@@ -40,7 +40,7 @@ const POSPage: React.FC = () => {
     }
   };
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen ng-base-200 overflow-hidden">
       {/* Fixed Navigation Bar */}
       <Navbar />
 

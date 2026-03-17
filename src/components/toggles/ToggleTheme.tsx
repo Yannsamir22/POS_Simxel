@@ -1,14 +1,8 @@
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// Map user-facing theme names → actual DaisyUI theme attribute values
+// Map user-facing theme names -> actual DaisyUI theme attribute values
 type ThemeChoice = "light" | "dark" | "system";
-
-const THEMES: { label: string; value: ThemeChoice; icon: any }[] = [
-  { label: "System", value: "system", icon: Monitor },
-  { label: "Light",  value: "light",  icon: Sun },
-  { label: "Dark",   value: "dark",   icon: Moon },
-];
 
 function resolveAndApply(choice: ThemeChoice) {
   let resolved: "simxel" | "simxel-dark";
@@ -24,6 +18,11 @@ function resolveAndApply(choice: ThemeChoice) {
   document.documentElement.setAttribute("data-theme", resolved);
   localStorage.setItem("theme", choice); // store user's choice, not resolved value
 }
+const THEMES: { label: string; value: ThemeChoice; icon: any }[] = [
+  { label: `t("themes.systeme")`, value: "system", icon: Monitor },
+  { label: ` t("themes.light")`, value: "light", icon: Sun },
+  { label: `t("themes.dark")`, value: "dark", icon: Moon },
+];
 
 const ToggleTheme = () => {
   const [theme, setTheme] = useState<ThemeChoice>(() => {
@@ -54,9 +53,13 @@ const ToggleTheme = () => {
         tabIndex={0}
         className="btn btn-ghost btn-circle hover:scale-110 transition-transform"
       >
-        {theme === "dark"   ? <Moon size={15} /> :
-         theme === "light"  ? <Sun  size={15} /> :
-                              <Monitor size={15} />}
+        {theme === "dark" ? (
+          <Moon size={15} />
+        ) : theme === "light" ? (
+          <Sun size={15} />
+        ) : (
+          <Monitor size={15} />
+        )}
       </label>
 
       <ul

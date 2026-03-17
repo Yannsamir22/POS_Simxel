@@ -1,4 +1,6 @@
 import React from "react";
+import { useT } from "../../../hooks/useT";
+import { toCamelCase } from "./StatsHeader";
 
 interface ChartDataPoint {
   name: string;
@@ -11,17 +13,23 @@ interface StatsChartProps {
 }
 
 const StatsChart: React.FC<StatsChartProps> = ({ chartData, period }) => {
+  const {t} = useT();
   if (!chartData || chartData.length === 0) {
     return (
       <div className="bg-base-200 rounded-xl border border-base-300 p-6 shadow-sm flex items-center justify-center h-52 opacity-20">
-        <p className="font-black uppercase tracking-widest text-sm">No chart data</p>
+        <p className="font-black uppercase tracking-widest text-sm">
+          {t("dashboard.noCharts")}
+        </p>
       </div>
     );
   }
 
   const max = Math.max(...chartData.map((d) => d.total), 1);
   const BAR_HEIGHT = 140;
-  const BAR_WIDTH = Math.max(20, Math.min(40, Math.floor(560 / chartData.length) - 8));
+  const BAR_WIDTH = Math.max(
+    20,
+    Math.min(40, Math.floor(560 / chartData.length) - 8),
+  );
   const GAP = Math.max(4, Math.floor(560 / chartData.length) - BAR_WIDTH);
   const totalWidth = chartData.length * (BAR_WIDTH + GAP) - GAP;
   const SVG_W = totalWidth + 8;
@@ -30,7 +38,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ chartData, period }) => {
   return (
     <div className="bg-base-200 rounded-xl border border-base-300 p-6 shadow-sm">
       <p className="text-[10px] font-black uppercase opacity-50 tracking-[0.3em] mb-4">
-        Revenue — {period}
+        {t("dashboard.kpi.revenue")} — {t(`dashboard.period.${toCamelCase(period)}`)}
       </p>
 
       <div className="overflow-x-auto">

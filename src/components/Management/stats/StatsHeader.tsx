@@ -1,4 +1,16 @@
 import React from "react";
+import { useT } from "../../../hooks/useT";
+
+export function toCamelCase(text: string) {
+  return text
+    .toLowerCase()
+    .split(" ")
+    .map((word, index) => {
+      if (index === 0) return word;
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join("");
+}
 
 export type Period =
   | "Today"
@@ -26,14 +38,15 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   onPeriodChange,
   loading,
 }) => {
+  const { t } = useT();
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div className="border-l-4 border-primary pl-5">
         <h2 className="text-2xl font-black uppercase tracking-tighter leading-tight">
-          Dashboard
+          {t("dashboard.title")}
         </h2>
         <p className="text-[10px] font-bold text-base-content/50 uppercase tracking-[0.3em]">
-          Business Performance Overview
+          {t("dashboard.subtitle")}
         </p>
       </div>
 
@@ -51,7 +64,7 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
                   : "text-base-content/60 hover:text-base-content hover:bg-base-300"
               }`}
           >
-            {p}
+            {t(`dashboard.period.${toCamelCase(p)}`)}
           </button>
         ))}
       </div>
