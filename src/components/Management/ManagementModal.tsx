@@ -259,18 +259,19 @@ const DeleteConfirm: React.FC<{
   onConfirm: () => void;
   onCancel: () => void;
   loading: boolean;
-}> = ({ name, onConfirm, onCancel, loading }) => (
+}> = ({ name, onConfirm, onCancel, loading }) => {
+  const { t } = useT();
+  return (
   <div className="p-6 flex flex-col items-center gap-4 text-center">
     <div className="p-4 rounded-full bg-error/10 text-error">
       <AlertTriangle size={28} />
     </div>
     <div>
       <p className="font-black text-base uppercase tracking-tight">
-        Delete this item?
+        {t("common.deleteConfirmTitle")}
       </p>
       <p className="text-sm text-base-content/60 mt-1">
-        <span className="font-bold text-base-content">{name}</span> will be
-        permanently removed. This cannot be undone.
+        <span className="font-bold text-base-content">{name}</span> {t("common.deleteConfirmDesc")}
       </p>
     </div>
     <div className="flex gap-3 w-full">
@@ -279,7 +280,7 @@ const DeleteConfirm: React.FC<{
         disabled={loading}
         className="btn btn-ghost flex-1 rounded-lg font-bold"
       >
-        Cancel
+        {t("common.cancel")}
       </button>
       <button
         onClick={onConfirm}
@@ -290,13 +291,13 @@ const DeleteConfirm: React.FC<{
           <span className="loading loading-spinner loading-xs" />
         ) : (
           <>
-            <Trash2 size={15} /> Delete
+            <Trash2 size={15} /> {t("common.delete")}
           </>
         )}
       </button>
     </div>
   </div>
-);
+);};
 
 // Main component
 
@@ -529,7 +530,7 @@ const ManagementModal: React.FC<ManagementModalProps> = ({
               </div>
             ) : options.length === 0 ? (
               <p className="text-xs opacity-40 text-center py-2">
-                No services available — add services first.
+                {t("services.noServicesAvailable")}
               </p>
             ) : (
               options.map((opt) => {

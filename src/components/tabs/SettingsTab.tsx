@@ -210,37 +210,6 @@ const SystemPreview: React.FC = () => (
   </svg>
 );
 
-// Theme card config 
-const THEMES: {
-  label: string;
-  value: ThemeChoice;
-  icon: React.FC;
-  preview: React.FC;
-  desc: string;
-}[] = [
-  {
-    label: "Light",
-    value: "light",
-    icon: Sun,
-    preview: LightPreview,
-    desc: "Clean white interface",
-  },
-  {
-    label: "Dark",
-    value: "dark",
-    icon: Moon,
-    preview: DarkPreview,
-    desc: "Easy on the eyes",
-  },
-  {
-    label: "System",
-    value: "system",
-    icon: Monitor,
-    preview: SystemPreview,
-    desc: "Follows your device",
-  },
-];
-
 // Component 
 const SettingsTab: React.FC = () => {
   const {t} = useT();
@@ -254,6 +223,36 @@ const [theme, setThemeState] = useState<ThemeChoice>(
     resolveAndApply(t);
   };
 
+  // Theme card config 
+  const THEMES: {
+    label: string;
+    value: ThemeChoice;
+    icon: React.FC;
+    preview: React.FC;
+    desc: string;
+  }[] = [
+    {
+      label: t("settings.themes.light"),
+      value: "light",
+      icon: Sun,
+      preview: LightPreview,
+      desc: t("settings.themes.lightDesc"),
+    },
+    {
+      label: t("settings.themes.dark"),
+      value: "dark",
+      icon: Moon,
+      preview: DarkPreview,
+      desc: t("settings.themes.darkDesc"),
+    },
+    {
+      label: t("settings.themes.system"),
+      value: "system",
+      icon: Monitor,
+      preview: SystemPreview,
+      desc: t("settings.themes.systemDesc"),
+    },
+  ];
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto py-4">
@@ -263,10 +262,10 @@ const [theme, setThemeState] = useState<ThemeChoice>(
           <Sun size={16} className="text-primary" />
           <div>
             <h3 className="font-black uppercase text-sm tracking-tight">
-              Appearance
+              {t("settings.appearance")}
             </h3>
             <p className="text-[10px] opacity-50 font-bold uppercase tracking-widest">
-              Theme &amp; Language
+              {t("settings.themeLabel")}
             </p>
           </div>
         </div>
@@ -275,7 +274,7 @@ const [theme, setThemeState] = useState<ThemeChoice>(
           {/* Theme cards */}
           <div>
             <p className="text-[10px] font-black uppercase opacity-40 tracking-widest mb-4">
-              Color Theme
+              {t("settings.colorTheme")}
             </p>
             <div className="grid grid-cols-3 gap-3">
               {THEMES.map(
@@ -331,14 +330,14 @@ const [theme, setThemeState] = useState<ThemeChoice>(
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-primary ring-2 ring-primary/30" />
                 <span className="text-[10px] font-black uppercase opacity-50 tracking-widest">
-                  Primary #0197f6
+                  {t("settings.primary")} #0197f6
                 </span>
               </div>
               <div className="w-px h-4 bg-base-300" />
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-secondary ring-2 ring-secondary/30" />
                 <span className="text-[10px] font-black uppercase opacity-50 tracking-widest">
-                  Secondary #16a34a
+                  {t("settings.secondary")} #16a34a
                 </span>
               </div>
             </div>
@@ -347,7 +346,7 @@ const [theme, setThemeState] = useState<ThemeChoice>(
           {/* Language */}
           <div>
             <p className="text-[10px] font-black uppercase opacity-40 tracking-widest mb-3">
-              Language
+              {t("settings.language")}
             </p>
             <div className="flex gap-2">
               {(["en", "fr"] as const).map((lang) => (
@@ -362,7 +361,7 @@ const [theme, setThemeState] = useState<ThemeChoice>(
                     }`}
                 >
                   <Globe size={15} />
-                  {lang === "en" ? "English" : "Français"}
+                  {lang === "en" ? t("languages.english") : t("languages.french")}
                 </button>
               ))}
             </div>
@@ -376,18 +375,18 @@ const [theme, setThemeState] = useState<ThemeChoice>(
           <Info size={16} className="text-secondary" />
           <div>
             <h3 className="font-black uppercase text-sm tracking-tight">
-              About
+              {t("settings.about")}
             </h3>
             <p className="text-[10px] opacity-50 font-bold uppercase tracking-widest">
-              Application Info
+              {t("settings.appInfo")}
             </p>
           </div>
         </div>
         <div className="p-5 space-y-2 text-sm">
           {[
-            { label: "Application", value: "Simxel POS" },
-            { label: "Version", value: "1.0.0" },
-            { label: "Mode", value: "Point of Sale" },
+            { label: t("settings.application"), value: "Simxel POS" },
+            { label: t("settings.version"), value: "1.0.0" },
+            { label: t("settings.mode"), value: "Point of Sale" },
           ].map(({ label, value }) => (
             <div
               key={label}

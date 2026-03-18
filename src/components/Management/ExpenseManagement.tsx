@@ -29,7 +29,7 @@ const ExpenseManagement: React.FC = () => {
     fetchExpenses();
   }, [fetchExpenses]);
 
-  if (loading) return <Loading message="Loading Expenses..." />;
+  if (loading) return <Loading message={t("common.loading")} />;
 
   const totalAll = expenses.reduce((s, e) => s + e.amount, 0);
   const now = new Date();
@@ -59,10 +59,10 @@ const ExpenseManagement: React.FC = () => {
     const result = await removeExpense(deleteTarget.id);
     setDeleting(false);
     if (result.success) {
-      addToast("Expense deleted", "success");
+      addToast(t("expenses.deleted"), "success");
       setDeleteTarget(null);
     } else {
-      addToast(result.error ?? "Failed to delete", "error");
+      addToast(result.error ?? t("common.deleteError"), "error");
     }
   };
 

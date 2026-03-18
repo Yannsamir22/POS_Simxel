@@ -14,7 +14,7 @@ const ExpensesTab: React.FC = () => {
     fetchExpenses();
   }, [fetchExpenses]);
 
-  if (loading) return <Loading message="Loading Expenses..." />;
+  if (loading) return <Loading message={t("common.loading")} />;
 
   const todayTotal = expenses
     .filter((e) => {
@@ -30,11 +30,11 @@ const ExpensesTab: React.FC = () => {
       <div className="flex justify-between items-center px-6 border-b border-base-300 py-4">
         <div>
           <h1 className="uppercase tracking-tighter font-extrabold">
-            Expenses
+            {t("nav.expenses")}
           </h1>
           {todayTotal > 0 && (
             <p className="text-[10px] opacity-50 font-bold">
-              Today: {todayTotal.toLocaleString()} FCFA
+              {t("dashboard.period.today")}: {todayTotal.toLocaleString()} FCFA
             </p>
           )}
         </div>
@@ -42,7 +42,7 @@ const ExpensesTab: React.FC = () => {
           onClick={() => setFormOpen(true)}
           className="btn btn-error btn-sm rounded-sm font-bold uppercase text-[10px] tracking-widest gap-2"
         >
-          <Plus size={14} /> New Expense
+          <Plus size={14} /> {t("expenses.addExpense")}
         </button>
       </div>
 
@@ -51,7 +51,7 @@ const ExpensesTab: React.FC = () => {
         <div className="flex-1 flex flex-col items-center justify-center opacity-20 gap-3">
           <Receipt size={48} />
           <p className="font-black uppercase tracking-widest text-sm">
-            No expenses
+            {t("expenses.noExpenses")}
           </p>
         </div>
       )}
@@ -89,7 +89,6 @@ const ExpensesTab: React.FC = () => {
           await addExpense(data);
         }}
         initial={null}
-        t={t}
       />
     </div>
   );

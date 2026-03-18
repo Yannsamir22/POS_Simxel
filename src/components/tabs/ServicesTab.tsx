@@ -38,7 +38,7 @@ const ServicesTab: React.FC = () => {
       {filteredServices.length === 0 && (
         <div className="flex-1 flex items-center justify-center opacity-30">
           <p className="font-black uppercase tracking-widest text-sm">
-            {search ? "No results" : "No services yet"}
+            {search ? t("pos.noResults") : t("services.noServices")}
           </p>
         </div>
       )}

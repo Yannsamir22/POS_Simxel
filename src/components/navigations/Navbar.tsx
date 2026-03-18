@@ -5,10 +5,12 @@ import { useAuthStore } from "../../stores/authStore";
 import SyncIndicator from "../toggles/SyncIndicator";
 import ToggleLanguage from "../toggles/ToggleLanguage";
 import ToggleTheme from "../toggles/ToggleTheme";
+import { useT } from "../../hooks/useT";
 
 const Navbar: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const accessLevel = useAuthStore((state) => state.accessLevel);
+  const { t } = useT();
   const managerLogout = useAuthStore((state) => state.managerLogout);
   const adminLogout = useAuthStore((state) => state.adminLogout);
   const [isOpen, setIsOpen] = useState(false);
@@ -55,7 +57,7 @@ const Navbar: React.FC = () => {
               onClick={handleLogout}
               className="btn btn-ghost flex items-center gap-2 hover:bg-error/20 hover:text-error transition-all"
             >
-              <span className="text-sm">Log Out</span>
+              <span className="text-sm">{t("nav.logout")}</span>
               <LogOut size={18} />
             </button>
           )}
@@ -65,7 +67,7 @@ const Navbar: React.FC = () => {
               onClick={() => Navigate("/admin/login")}
               className="btn btn-ghost flex items-center gap-2 font-bold"
             >
-              <span className="text-sm">Admin</span>
+              <span className="text-sm">{t("auth.adminSpace")}</span>
               <User size={15} />
             </button>
           )}
@@ -105,7 +107,7 @@ const Navbar: React.FC = () => {
           >
             <div className="flex flex-col h-full mt-12 text-xs">
               <h2 className="text-xs font-semibold uppercase text-base-content/50 mb-4 px-2">
-                Menu
+                {t("nav.menu")}
               </h2>
               <nav className="flex flex-col gap-2">
                 {accessLevel !== "admin" && (
@@ -120,7 +122,7 @@ const Navbar: React.FC = () => {
                       <div className="p-2 rounded-lg text-primary">
                         <User size={20} />
                       </div>
-                      <span className="font-medium">Admin Dashboard</span>
+                      <span className="font-medium">{t("nav.dashboard")}</span>
                     </div>
                     <ChevronRight
                       size={16}
@@ -135,14 +137,14 @@ const Navbar: React.FC = () => {
                       <div className="p-2 bg-error/10 rounded-lg ">
                         <LogOut size={20} />
                       </div>
-                      <span className="font-medium">LogOut</span>
+                      <span className="font-medium">{t("nav.logout")}</span>
                     </div>
                   </button>
                 )}
               </nav>
               <div className="mt-auto pt-6 border-t border-base-200 bg-base-100">
                 <div className="flex items-center justify-between px-2">
-                  <span className="text-sm font-medium">Language</span>
+                  <span className="text-sm font-medium">{t("settings.language")}</span>
                   <ToggleLanguage />
                 </div>
               </div>

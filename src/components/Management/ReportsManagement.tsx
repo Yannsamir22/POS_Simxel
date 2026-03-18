@@ -81,10 +81,11 @@ const ExportCard: React.FC<{
 }) => {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const { t } = useT();
 
   const handleClick = async () => {
     if (needsDates && (!startDate || !endDate)) {
-      setErr("Please select a date range first.");
+      setErr(t("reports.selectDateRange"));
       return;
     }
     setErr(null);
@@ -92,7 +93,7 @@ const ExportCard: React.FC<{
     try {
       await onDownload();
     } catch (e: any) {
-      setErr(e.response?.data?.error ?? "Download failed.");
+      setErr(e.response?.data?.error ?? t("reports.downloadFailed"));
     } finally {
       setBusy(false);
     }

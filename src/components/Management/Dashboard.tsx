@@ -7,6 +7,7 @@ import StatsHeader, { type Period } from "./stats/StatsHeader";
 import StatsOverview from "./stats/StatsOverview";
 import StatsTops from "./stats/StatsTops";
 import NoSales from "./stats/NoSales";
+import { useT } from "../../hooks/useT";
 
 
 // separate named arrays instead of one merged flat list.
@@ -31,6 +32,7 @@ const Dashboard: React.FC = () => {
   const [data,    setData]    = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState<string | null>(null);
+  const { t } = useT();
 
   useEffect(() => {
     let cancelled = false;
@@ -42,7 +44,7 @@ const Dashboard: React.FC = () => {
         if (!cancelled) setData(res);
       } catch (err: any) {
         if (!cancelled)
-          setError(err.response?.data?.error ?? "Failed to load dashboard data");
+          setError(err.response?.data?.error ?? t("dashboard.loadError"));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -51,7 +53,7 @@ const Dashboard: React.FC = () => {
     return () => { cancelled = true; };
   }, [period]);
 
-  if (loading) return <Loading message="Loading Dashboard..." />;
+  if (loading) return <Loading message={t("common.loading")} />;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">

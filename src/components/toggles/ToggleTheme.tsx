@@ -1,5 +1,6 @@
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useT } from "../../hooks/useT";
 
 // Map user-facing theme names -> actual DaisyUI theme attribute values
 type ThemeChoice = "light" | "dark" | "system";
@@ -18,13 +19,15 @@ function resolveAndApply(choice: ThemeChoice) {
   document.documentElement.setAttribute("data-theme", resolved);
   localStorage.setItem("theme", choice); // store user's choice, not resolved value
 }
-const THEMES: { label: string; value: ThemeChoice; icon: any }[] = [
-  { label: `t("themes.systeme")`, value: "system", icon: Monitor },
-  { label: ` t("themes.light")`, value: "light", icon: Sun },
-  { label: `t("themes.dark")`, value: "dark", icon: Moon },
-];
 
 const ToggleTheme = () => {
+  const { t } = useT();
+  const THEMES: { label: string; value: ThemeChoice; icon: any }[] = [
+    { label: t("themes.system"), value: "system", icon: Monitor },
+    { label: t("themes.light"), value: "light", icon: Sun },
+    { label: t("themes.dark"), value: "dark", icon: Moon },
+  ];
+
   const [theme, setTheme] = useState<ThemeChoice>(() => {
     return (localStorage.getItem("theme") as ThemeChoice) || "system";
   });
