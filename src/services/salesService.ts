@@ -13,10 +13,7 @@ export const SalesService = {
     saleDate?: string;
   }) => {
     const res = await axiosInstance.post("/sales", payload);
-    // Only open the receipt URL if one is actually returned
-    if (res.data?.receipt) {
-      window.open(res.data.receipt);
-    }
+
     return res.data;
   },
 

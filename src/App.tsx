@@ -15,6 +15,7 @@ import POSLogin from "./pages/POSLogin";
 import POSPage from "./pages/POSPage";
 import SetupPage from "./pages/SetupPage";
 import { useAuthStore } from "./stores/authStore";
+import UpdateBanner from "./components/UpdateBanner";
 
 type AppStatus = "checking" | "setup" | "ready";
 
@@ -63,6 +64,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-base-100 font-sans text-base-content">
+      <UpdateBanner/>
       <Toast />
       <Router>
         <Routes>

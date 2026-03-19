@@ -34,6 +34,10 @@ export type Ticket = {
   total: number;
 };
 
+type ConfirmResult =
+  | { success: true; receiptPath: string | null }
+  | { success: false; error: string };
+
 type TicketState = {
   currentTicket: Ticket;
   pendingTickets: Ticket[];
@@ -49,12 +53,12 @@ type TicketState = {
   removePendingTicket: (index: number) => void;
   addPayment: (payment: PaymentInput) => void;
   clearPayments: () => void;
-  confirmTicket: () => Promise<{ success: boolean; error?: string }>;
+  confirmTicket: () => Promise<ConfirmResult>;
   assignEmployee: (itemId: string, employeeId: string) => void;
   assignPackageEmployee: (
     itemId: string,
     serviceId: string,
-    employeeId: string
+    employeeId: string,
   ) => void;
 };
 
@@ -77,7 +81,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   pendingTickets: [],
   selectedPendingIndex: null,
 
-  // sADD ITEM 
+  // sADD ITEM
   addItem: (item) =>
     set((state) => {
       const existing = state.currentTicket.items.find((i) => i.id === item.id);
@@ -86,7 +90,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       // Only stack quantity for PRODUCT; services/packages always add as new rows
       if (existing && item.type === "PRODUCT") {
         newItems = state.currentTicket.items.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
         );
       } else {
         newItems = [...state.currentTicket.items, { ...item }];
@@ -101,35 +105,49 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       };
     }),
 
-  // sREMOVE ITEM 
+  // sREMOVE ITEM
   removeItem: (id) =>
     set((state) => {
       const items = state.currentTicket.items.filter((i) => i.id !== id);
       return {
-        currentTicket: { ...state.currentTicket, items, total: calcTotal(items) },
+        currentTicket: {
+          ...state.currentTicket,
+          items,
+          total: calcTotal(items),
+        },
       };
     }),
 
-  // sUPDATE QTY 
+  // sUPDATE QTY
   updateQty: (id, qty) =>
     set((state) => {
       if (qty <= 0) {
         // Remove item if qty hits 0
         const items = state.currentTicket.items.filter((i) => i.id !== id);
-        return { currentTicket: { ...state.currentTicket, items, total: calcTotal(items) } };
+        return {
+          currentTicket: {
+            ...state.currentTicket,
+            items,
+            total: calcTotal(items),
+          },
+        };
       }
       const items = state.currentTicket.items.map((i) =>
-        i.id === id ? { ...i, quantity: qty } : i
+        i.id === id ? { ...i, quantity: qty } : i,
       );
       return {
-        currentTicket: { ...state.currentTicket, items, total: calcTotal(items) },
+        currentTicket: {
+          ...state.currentTicket,
+          items,
+          total: calcTotal(items),
+        },
       };
     }),
 
-  // sCLEAR TICKET 
+  // sCLEAR TICKET
   clearTicket: () => set({ currentTicket: freshTicket() }),
 
-  // sPARK / LOAD 
+  // sPARK / LOAD
   parkTicket: () =>
     set((state) => ({
       pendingTickets: [...state.pendingTickets, { ...state.currentTicket }],
@@ -141,7 +159,11 @@ export const useTicketStore = create<TicketState>((set, get) => ({
     set((state) => {
       const ticket = state.pendingTickets[index];
       const pending = state.pendingTickets.filter((_, i) => i !== index);
-      return { currentTicket: ticket, pendingTickets: pending, selectedPendingIndex: null };
+      return {
+        currentTicket: ticket,
+        pendingTickets: pending,
+        selectedPendingIndex: null,
+      };
     }),
 
   selectPendingTicket: (index) => set({ selectedPendingIndex: index }),
@@ -167,7 +189,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
     })),
 
   // sCONFIRM TICKET ─
-  confirmTicket: async () => {
+  confirmTicket: async (): Promise<ConfirmResult> => {
     const ticket = get().currentTicket;
 
     if (ticket.items.length === 0) {
@@ -206,24 +228,26 @@ export const useTicketStore = create<TicketState>((set, get) => ({
         payments: ticket.payments,
       };
 
-      await SalesService.createSale(payload);
+      const data = await SalesService.createSale(payload);
       set({ currentTicket: freshTicket() });
-      return { success: true };
+      return { success: true, receiptPath: data?.receipt ?? null };
     } catch (error: any) {
       const msg =
-        error.response?.data?.error ?? error.message ?? "Failed to confirm sale";
+        error.response?.data?.error ??
+        error.message ??
+        "Failed to confirm sale";
       console.error("[TicketStore] confirmTicket error:", msg);
       return { success: false, error: msg };
     }
   },
 
-  // sASSIGN EMPLOYEE 
+  // sASSIGN EMPLOYEE
   assignEmployee: (itemId, employeeId) =>
     set((state) => ({
       currentTicket: {
         ...state.currentTicket,
         items: state.currentTicket.items.map((item) =>
-          item.id === itemId ? { ...item, employeeId } : item
+          item.id === itemId ? { ...item, employeeId } : item,
         ),
       },
     })),
@@ -238,7 +262,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
           return {
             ...item,
             services: item.services.map((s) =>
-              s.serviceId === serviceId ? { ...s, employeeId } : s
+              s.serviceId === serviceId ? { ...s, employeeId } : s,
             ),
           };
         }),

@@ -1,24 +1,32 @@
-// vite.config.ts
-import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  main: {
+    plugins: [externalizeDepsPlugin({ exclude: ["electron-updater"] })],
+  },
 
-  base: "./",
+  preload: {
+    plugins: [externalizeDepsPlugin()],
+  },
 
-  server: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:3000",
-        changeOrigin: true,
-        secure: false,
+  renderer: {
+    root: "src/renderer",
+    plugins: [react()],
+    server: {
+      port: 5173,
+      proxy: {
+        "/api": {
+          target: "http://localhost:3000",
+          changeOrigin: true,
+          secure: false,
+        },
       },
     },
-  },
-  build: {
-    outDir: "dist",
-    emptyOutDir: true,
+    define: {
+      "import.meta.env.VITE_API_URL": JSON.stringify(
+        "http://localhost:3000/api/v1"
+      ),
+    },
   },
 });

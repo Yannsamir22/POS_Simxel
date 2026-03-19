@@ -23,10 +23,10 @@ function resolveAndApply(choice: ThemeChoice) {
 const ToggleTheme = () => {
   const { t } = useT();
   const THEMES: { label: string; value: ThemeChoice; icon: any }[] = [
-    { label: t("themes.system"), value: "system", icon: Monitor },
-    { label: t("themes.light"), value: "light", icon: Sun },
-    { label: t("themes.dark"), value: "dark", icon: Moon },
-  ];
+  { label: t("settings.themes.system"), value: "system", icon: Monitor },
+  { label: t("settings.themes.light"),  value: "light",  icon: Sun },
+  { label: t("settings.themes.dark"),   value: "dark",   icon: Moon },
+];
 
   const [theme, setTheme] = useState<ThemeChoice>(() => {
     return (localStorage.getItem("theme") as ThemeChoice) || "system";

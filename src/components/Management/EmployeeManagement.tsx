@@ -54,7 +54,7 @@ const EmployeeManagement = () => {
   };
   const handleDelete = async () => {
     const result = await removeEmployee(target!.id);
-    if (result.success) addToast("Employee deleted", " success");
+    if (result.success) addToast("Employee deleted successfully");
     return result;
   };
 
@@ -70,7 +70,7 @@ const EmployeeManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-base-200 rounded-md shadow-xl border border-base-300 overflow-hiden relative">
+      <div className="bg-base-200 rounded-md shadow-xl border border-base-300 overflow-hidden relative">
         <div className="p-6 border-b border-base-300 flex justify-between items-center relative">
           <div className="absolute left-4 top-8 bottom-8 w-px bg-primary" />
           <div className="pl-6">

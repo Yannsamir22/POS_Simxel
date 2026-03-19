@@ -25,3 +25,4 @@ dist-ssr
 
 collect.py
 all_files.txt
+dist-electron

@@ -182,7 +182,7 @@
     "language": "Language",
     "security": "Security",
     "changeAdminPass": "Change Admin Password",
-    "changManagerPass": "Change Manager Password",
+    "changeManagerPass": "Change Manager Password",
     "currentPass": "Current password",
     "newPass": "New password",
     "confirmPass": "Confirm new password",
@@ -192,6 +192,9 @@
     "passSuccess": "Password changed successfully",
     "about": "About",
     "appInfo": "Application Info",
+    "application": "Application",
+    "version": "Version",
+    "mode": "Mode",
     "themes": {
       "light": "Light",
       "dark": "Dark",

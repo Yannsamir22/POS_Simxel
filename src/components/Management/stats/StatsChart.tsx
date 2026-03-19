@@ -1,4 +1,16 @@
+// src/components/Management/stats/StatsChart.tsx
 import React from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { useT } from "../../../hooks/useT";
 import { toCamelCase } from "./StatsHeader";
 
@@ -12,101 +24,112 @@ interface StatsChartProps {
   period: string;
 }
 
-const StatsChart: React.FC<StatsChartProps> = ({ chartData, period }) => {
-  const {t} = useT();
-  if (!chartData || chartData.length === 0) {
-    return (
-      <div className="bg-base-200 rounded-xl border border-base-300 p-6 shadow-sm flex items-center justify-center h-52 opacity-20">
-        <p className="font-black uppercase tracking-widest text-sm">
-          {t("dashboard.noCharts")}
-        </p>
-      </div>
-    );
-  }
+const fmt = (n: number) =>
+  n >= 1_000_000
+    ? `${(n / 1_000_000).toFixed(1)}M`
+    : n >= 1_000
+    ? `${(n / 1_000).toFixed(0)}k`
+    : `${n}`;
 
-  const max = Math.max(...chartData.map((d) => d.total), 1);
-  const BAR_HEIGHT = 140;
-  const BAR_WIDTH = Math.max(
-    20,
-    Math.min(40, Math.floor(560 / chartData.length) - 8),
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-base-100 border border-base-300 rounded-lg px-3 py-2 shadow-lg text-xs">
+      <p className="font-black opacity-60 mb-1">{label}</p>
+      <p className="font-black text-primary">
+        {payload[0].value.toLocaleString("fr-FR")} FCFA
+      </p>
+    </div>
   );
-  const GAP = Math.max(4, Math.floor(560 / chartData.length) - BAR_WIDTH);
-  const totalWidth = chartData.length * (BAR_WIDTH + GAP) - GAP;
-  const SVG_W = totalWidth + 8;
-  const SVG_H = BAR_HEIGHT + 40; // bars + x-axis labels
+};
+
+const Empty = () => (
+  <div className="h-40 flex items-center justify-center opacity-20">
+    <p className="text-xs font-black uppercase tracking-widest">—</p>
+  </div>
+);
+
+const StatsChart: React.FC<StatsChartProps> = ({ chartData, period }) => {
+  const { t } = useT();
+  const periodLabel = t(`dashboard.period.${toCamelCase(period)}`);
+  const hasData = chartData && chartData.length > 0;
 
   return (
-    <div className="bg-base-200 rounded-xl border border-base-300 p-6 shadow-sm">
-      <p className="text-[10px] font-black uppercase opacity-50 tracking-[0.3em] mb-4">
-        {t("dashboard.kpi.revenue")} — {t(`dashboard.period.${toCamelCase(period)}`)}
-      </p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-      <div className="overflow-x-auto">
-        <svg
-          width="100%"
-          viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-          xmlns="http://www.w3.org/2000/svg"
-          className="overflow-visible"
-        >
-          {chartData.map((d, i) => {
-            const barH = Math.max(4, Math.round((d.total / max) * BAR_HEIGHT));
-            const x = i * (BAR_WIDTH + GAP);
-            const y = BAR_HEIGHT - barH;
-            const isHighest = d.total === max;
-
-            return (
-              <g key={d.name}>
-                {/* Bar */}
-                <rect
-                  x={x}
-                  y={y}
-                  width={BAR_WIDTH}
-                  height={barH}
-                  rx={4}
-                  className={isHighest ? "fill-primary" : "fill-primary/40"}
-                />
-
-                {/* Value label on top of bar (only if bar is tall enough) */}
-                {barH > 20 && (
-                  <text
-                    x={x + BAR_WIDTH / 2}
-                    y={y - 4}
-                    textAnchor="middle"
-                    fontSize={9}
-                    className="fill-base-content opacity-60 font-bold"
-                  >
-                    {d.total >= 1000
-                      ? `${(d.total / 1000).toFixed(0)}k`
-                      : d.total}
-                  </text>
-                )}
-
-                {/* X-axis label */}
-                <text
-                  x={x + BAR_WIDTH / 2}
-                  y={BAR_HEIGHT + 18}
-                  textAnchor="middle"
-                  fontSize={9}
-                  className="fill-base-content opacity-40 font-bold uppercase"
-                >
-                  {d.name.length > 6 ? d.name.slice(0, 5) + "…" : d.name}
-                </text>
-              </g>
-            );
-          })}
-
-          {/* Baseline */}
-          <line
-            x1={0}
-            y1={BAR_HEIGHT}
-            x2={SVG_W}
-            y2={BAR_HEIGHT}
-            stroke="currentColor"
-            strokeOpacity={0.1}
-            strokeWidth={1}
-          />
-        </svg>
+      {/* ── Line Chart ──────────────────────────────────────────────── */}
+      <div className="bg-base-200 border border-base-300 rounded-xl p-4 shadow-sm">
+        <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-4">
+          {t("dashboard.kpi.revenue")} — {periodLabel}
+        </p>
+        {!hasData ? <Empty /> : (
+          <ResponsiveContainer width="100%" height={160}>
+            <LineChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 9, opacity: 0.5 }}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                tickFormatter={fmt}
+                tick={{ fontSize: 9, opacity: 0.5 }}
+                axisLine={false}
+                tickLine={false}
+                width={36}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="#0197f6"
+                strokeWidth={2}
+                dot={{ r: 3, fill: "#0197f6" }}
+                activeDot={{ r: 5 }}
+                isAnimationActive={true}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </div>
+
+      {/* ── Bar Chart ───────────────────────────────────────────────── */}
+      <div className="bg-base-200 border border-base-300 rounded-xl p-4 shadow-sm">
+        <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-4">
+          {t("dashboard.chart")} — {periodLabel}
+        </p>
+        {!hasData ? <Empty /> : (
+          <ResponsiveContainer width="100%" height={160}>
+            <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.1} />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 9, opacity: 0.5 }}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                tickFormatter={fmt}
+                tick={{ fontSize: 9, opacity: 0.5 }}
+                axisLine={false}
+                tickLine={false}
+                width={36}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar
+                dataKey="total"
+                fill="#0197f6"
+                radius={[4, 4, 0, 0]}
+                isAnimationActive={true}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
     </div>
   );
 };

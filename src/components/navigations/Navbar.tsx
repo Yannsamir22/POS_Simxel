@@ -1,11 +1,31 @@
 import { ChevronRight, LogOut, Menu, User, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useT } from "../../hooks/useT";
 import { useAuthStore } from "../../stores/authStore";
 import SyncIndicator from "../toggles/SyncIndicator";
 import ToggleLanguage from "../toggles/ToggleLanguage";
 import ToggleTheme from "../toggles/ToggleTheme";
-import { useT } from "../../hooks/useT";
+import logoLight from "../../assets/simxel_light.svg"
+import logoDark from "../../assets/simxel_dark.svg"
+
+function useIsDark(): boolean {
+  const [isDark, setIsDark] = useState(() => document.documentElement.getAttribute("data-theme") === "simxel-dark")
+  
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.getAttribute("data-theme") === "simxel-dark")
+    })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"]
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  return isDark
+}
 
 const Navbar: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -16,8 +36,11 @@ const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const Navigate = useNavigate();
 
+  const isDark = useIsDark();
+  const logo = isDark ? logoDark : logoLight
+
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "unser";
+    document.body.style.overflow = isOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -40,14 +63,13 @@ const Navbar: React.FC = () => {
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => Navigate(accessLevel === "admin" ? "/admin" : "/")}
         >
-          <figure className="h-10 w-10 flex items-center justify-center">
+          <figure className="h-15 w-30 flex items-center justify-center">
             <img
-              src="/Sample.svg"
+              src={logo}
               alt="Simxel"
               className="h-full object-contain"
             />
           </figure>
-          <span className="text-xl md:text-2xl font-bold">Simxel</span>
         </div>
 
         {/* DESKTOP MENU */}
@@ -144,7 +166,9 @@ const Navbar: React.FC = () => {
               </nav>
               <div className="mt-auto pt-6 border-t border-base-200 bg-base-100">
                 <div className="flex items-center justify-between px-2">
-                  <span className="text-sm font-medium">{t("settings.language")}</span>
+                  <span className="text-sm font-medium">
+                    {t("settings.language")}
+                  </span>
                   <ToggleLanguage />
                 </div>
               </div>

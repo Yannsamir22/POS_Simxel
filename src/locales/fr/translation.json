@@ -192,6 +192,9 @@
     "passSuccess": "Mot de passe modifié avec succès",
     "about": "À propos",
     "appInfo": "Informations de l'application",
+    "application": "Application",
+    "version": "Version",
+    "mode": "Mode",
     "themes": {
       "light": "Clair",
       "dark": "Sombre",

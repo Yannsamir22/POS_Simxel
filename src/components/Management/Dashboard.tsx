@@ -1,30 +1,30 @@
+// src/components/Management/Dashboard.tsx
 import React, { useEffect, useState } from "react";
 import Loading from "../../loadash/Loading";
 import { SalesService } from "../../services/salesService";
-import PaymentStats from "./stats/PaymentStats";
-import StatsChart from "./stats/StatsChart";
+import { useT } from "../../hooks/useT";
 import StatsHeader, { type Period } from "./stats/StatsHeader";
 import StatsOverview from "./stats/StatsOverview";
+import StatsChart from "./stats/StatsChart";
+import PaymentStats from "./stats/PaymentStats";
+import SalesMix from "./stats/SalesMix";
 import StatsTops from "./stats/StatsTops";
 import NoSales from "./stats/NoSales";
-import { useT } from "../../hooks/useT";
 
-
-// separate named arrays instead of one merged flat list.
 export interface TopEntry {
   name: string;
-  value: number;
+  revenue: number;
 }
 
 interface DashboardData {
-  period:      string;
-  overview:    { label: string; value: number; unit: string }[];
-  payments:    { CASH: number; OM: number; MOMO: number; CARD?: number };
+  period:       string;
+  overview:     { label: string; value: number; unit: string }[];
+  payments:     { CASH: number; OM: number; MOMO: number; CARD?: number };
   topServices:  TopEntry[];
   topProducts:  TopEntry[];
   topEmployees: TopEntry[];
   topPackages:  TopEntry[];
-  chartData:   { name: string; total: number }[];
+  chartData:    { name: string; total: number }[];
 }
 
 const Dashboard: React.FC = () => {
@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
         if (!cancelled) setData(res);
       } catch (err: any) {
         if (!cancelled)
-          setError(err.response?.data?.error ?? t("dashboard.loadError"));
+          setError(err.response?.data?.error ?? "Failed to load dashboard");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -55,42 +55,52 @@ const Dashboard: React.FC = () => {
 
   if (loading) return <Loading message={t("common.loading")} />;
 
+  const isEmpty = !loading && !error && data && (data.overview?.[0]?.value ?? 0) === 0;
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-5 animate-in fade-in duration-300">
+
+      {/* Period selector */}
       <StatsHeader period={period} onPeriodChange={setPeriod} loading={loading} />
 
+      {/* Error */}
       {error && (
         <div className="alert alert-error rounded-xl">
           <span className="font-bold text-sm">{error}</span>
         </div>
       )}
 
-      {!loading && data && (
+      {data && !isEmpty && (
         <>
-          <StatsOverview overview={data.overview} />
+          {/* 1 — KPI cards */}
+          <StatsOverview overview={data.overview ?? []} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2">
-              <StatsChart chartData={data.chartData} period={period} />
-            </div>
-            <div>
-              <PaymentStats payments={data.payments} />
-            </div>
-          </div>
+          {/* 2 — Revenue charts (line + bar) */}
+          <StatsChart chartData={data.chartData ?? []} period={period} />
 
-          {/*  four separate arrays instead of old flat stats[] */}
-          <StatsTops
+          {/* 3 — Payment charts (pie + horizontal bar) */}
+          <PaymentStats payments={data.payments} />
+
+          {/* 4 — Sales mix (donut + radial) */}
+          <SalesMix
             topServices={data.topServices   ?? []}
             topProducts={data.topProducts   ?? []}
+            topPackages={data.topPackages   ?? []}
+          />
+
+          {/* 5 — Top performers (products, services, employees, packages) */}
+          <StatsTops
+            topProducts={data.topProducts   ?? []}
+            topServices={data.topServices   ?? []}
             topEmployees={data.topEmployees ?? []}
             topPackages={data.topPackages   ?? []}
           />
         </>
       )}
 
-      {!loading && !error && data && data.overview[0]?.value === 0 && (
-        <NoSales />
-      )}
+      {/* Empty state */}
+      {isEmpty && <NoSales />}
+
     </div>
   );
 };

@@ -1,0 +1,94 @@
+# electron-builder.yml
+#
+# Full build configuration for Simxel desktop app.
+# Run:  npm run dist         → current platform
+#       npm run dist:win     → Windows NSIS installer
+#       npm run dist:mac     → macOS DMG
+#       npm run dist:linux   → Linux AppImage
+
+appId: com.simxel.pos
+productName: Simxel
+copyright: Copyright © 2026 Simxel
+
+# Directories
+directories:
+      output: release         # Built installers go here
+      buildResources: assets  #Icons, license, etc.
+
+# Files packed into the app
+files:
+      - dist/**               # Renderer (React build)
+      - dist-electron/**      # Main + preload
+
+# Extra resources (backend)
+# The compiled Simxel backend is placed in resources/backend/
+# so the main process can spawn it with:  path.join(process.resourcesPath, 'backend', 'server.js')
+extraResources:
+      # Commpiled TypeScript output of the backend
+      - from: ../Simxel/dist
+        to: backend
+        filter:
+         - "**/*.js"
+         - "**/*.json"
+         - "!**/*.test.js"
+
+         #Prisma schema + migrations (needed by the backend at runtime)
+      - from: ../Simxel/prisma
+        to: backend/prisma
+        filter:
+        - "**/*"
+
+      # ── Native / non-bundlable node_modules ──────────────────────────────────
+      # Only ship what can't be bundled by esbuild (native addons, prisma engine).
+      # To keep the installer small, bundle the rest with:
+      #   cd ../Simxel && npx esbuild src/server.ts \
+      #     --bundle --platform=node --target=node20 \
+      #     --outfile=dist/server.js \
+      #     --external:@prisma/client --external:bcrypt
+      - from: ../Simxel/node_modules/@prisma
+        to: backend/node_modules/@prisma
+      - from: ../Simxel/node_modules/.prisma
+        to: backend/node_modules/.prisma
+      - from: ../Simxel/node_modules/bcrypt
+        to: backend/node_modules/bcrypt
+
+# Windows
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: assets/simxel_logo.ico
+  # Signing (optional — needed for SmartScreen bypass)
+  # certificateFile: cert.pfx
+  # certificatePassword: ${CERT_PASSWORD}
+ 
+nsis:
+  oneClick: false           # Let user choose install dir
+  allowToChangeInstallationDirectory: true
+  installerIcon: assets/simxel_logo.ico
+  uninstallerIcon: assets/simxel_logo.ico
+  shortcutName: Simxel
+
+# macOS
+mac:
+  target:
+    - dmg
+  icon: assets/icon.icns
+  category: public.app-category.business
+  # notarize: true  # Requires Apple Developer account
+
+# Linux
+linux:
+  target:
+    - AppImage
+  icon: assets/icon.png
+  category: Office
+
+# Auto-updater publish configuration
+# Using GitHub Releases (myAcount):
+publish:
+      provider: github
+      owner: Yannsamir22
+      repo: simxel  # <- replace with name of repo 
+      private: false
