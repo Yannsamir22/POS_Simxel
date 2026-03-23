@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useT } from "../../hooks/useT";
 import Loading from "../../loadash/Loading";
 import { useExpenseStore } from "../../stores/expenseStore";
+import { useToastStore } from "../../stores/toastStore";
 import ExpenseForm from "../forms/ExpenseForm";
 
 const ExpensesTab: React.FC = () => {
   const { t } = useT();
+  const addToast = useToastStore((s: any) => s.addToast);
   const { expenses, fetchExpenses, addExpense, loading } = useExpenseStore();
   const [formOpen, setFormOpen] = useState(false);
 
@@ -23,6 +25,23 @@ const ExpensesTab: React.FC = () => {
       return d.toDateString() === n.toDateString();
     })
     .reduce((s, e) => s + e.amount, 0);
+
+
+  const handleSubmit = async (data: {
+    type: string;
+    amount: number;
+    note?: string;
+    date: string;
+  }) => {
+    const result = await addExpense(data);
+    if (result.success) {
+      addToast(t("expenses.added"), "success");
+      setFormOpen(false);
+    } else {
+      addToast(result.error ?? t("common.error"), "error");
+    }
+    return result;
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -65,7 +84,7 @@ const ExpensesTab: React.FC = () => {
           >
             <div className="flex flex-col">
               <span className="font-bold text-sm uppercase">
-                {expense.type}
+                {String(t(`expenses.types.${expense.type}`, { defaultValue: expense.type } as any))}
               </span>
               {expense.note && (
                 <span className="text-xs opacity-50">{expense.note}</span>
@@ -85,9 +104,7 @@ const ExpensesTab: React.FC = () => {
       <ExpenseForm
         open={formOpen}
         onClose={() => setFormOpen(false)}
-        onSubmit={async (data: { type: string; amount: number; note?: string; date?: string; }) => {
-          await addExpense(data);
-        }}
+        onSubmit={handleSubmit}
         initial={null}
       />
     </div>

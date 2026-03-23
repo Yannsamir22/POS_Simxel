@@ -81,7 +81,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
   pendingTickets: [],
   selectedPendingIndex: null,
 
-  // sADD ITEM
+  // ADD ITEM
   addItem: (item) =>
     set((state) => {
       const existing = state.currentTicket.items.find((i) => i.id === item.id);
@@ -105,7 +105,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       };
     }),
 
-  // sREMOVE ITEM
+  // REMOVE ITEM
   removeItem: (id) =>
     set((state) => {
       const items = state.currentTicket.items.filter((i) => i.id !== id);
@@ -118,7 +118,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       };
     }),
 
-  // sUPDATE QTY
+  // UPDATE QTY
   updateQty: (id, qty) =>
     set((state) => {
       if (qty <= 0) {
@@ -144,10 +144,10 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       };
     }),
 
-  // sCLEAR TICKET
+  // CLEAR TICKET
   clearTicket: () => set({ currentTicket: freshTicket() }),
 
-  // sPARK / LOAD
+  // PARK / LOAD
   parkTicket: () =>
     set((state) => ({
       pendingTickets: [...state.pendingTickets, { ...state.currentTicket }],
@@ -174,7 +174,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       selectedPendingIndex: null,
     })),
 
-  // sPAYMENTS ───────
+  // PAYMENTS ───────
   addPayment: (payment) =>
     set((state) => ({
       currentTicket: {
@@ -188,7 +188,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
       currentTicket: { ...state.currentTicket, payments: [] },
     })),
 
-  // sCONFIRM TICKET ─
+  // CONFIRM TICKET ─
   confirmTicket: async (): Promise<ConfirmResult> => {
     const ticket = get().currentTicket;
 
@@ -197,6 +197,24 @@ export const useTicketStore = create<TicketState>((set, get) => ({
     }
     if (ticket.payments.length === 0) {
       return { success: false, error: "No payment provided" };
+    }
+
+    for(const item of ticket.items) {
+      if(item.type === "SERVICE" && !item.employeeId){
+        return {
+          success: false,
+          error: `Please assign an employee to ${item.name}`
+        }
+      }
+      if(item.type === "PACKAGE"){
+        const missing = item.services?.find((s) => !s.employeeId);
+        if(missing){
+          return {
+            success: false,
+            error: `Please assign an employee to ${missing.name} in package ${item.name}`
+          }
+        }
+      }
     }
 
     // Validate payment total matches ticket total
@@ -241,7 +259,7 @@ export const useTicketStore = create<TicketState>((set, get) => ({
     }
   },
 
-  // sASSIGN EMPLOYEE
+  // ASSIGN EMPLOYEE
   assignEmployee: (itemId, employeeId) =>
     set((state) => ({
       currentTicket: {

@@ -24,11 +24,16 @@ export interface ElectronAPI {
 
   // App info
   getAppVersion: () => Promise<string>;
+  getBackendPort: () => Promise<number>;
+
+  // Cloud DB URL
+  setCloudUrl: (url: string) => Promise<{ ok: boolean; error?: string }>;
+  getCloudUrl: () => Promise<string | null>;
 
   // Auto-updater
   onUpdateAvailable: (cb: (info: { version: string }) => void) => () => void;
   onUpdateDownloaded: (cb: (info: { version: string }) => void) => () => void;
-  onUpdateProgress: (cb: (progress: { percent:number}) => void) => () => void;
+  onUpdateProgress: (cb: (progress: { percent: number }) => void) => () => void;
 
   installUpdate: () => void;
   checkForUpdates: () => void;
@@ -38,6 +43,8 @@ declare global {
   interface Window {
     // Available only running inside electron
     electronAPI?: ElectronAPI;
+
+    __BACKEND_PORT__?: number;
   }
 }
 

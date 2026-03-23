@@ -29,10 +29,6 @@ const POSAdminLogin: React.FC = () => {
     setSubmitting(false);
   };
 
-  // fix: was `navigate(-1) && isAuthenticated ? navigate("/") : navigate("/login")`
-  // navigate(-1) returns void (truthy) so the ternary ALWAYS fired a second navigate(),
-  // overriding browser history and keeping the user on the same page.
-  // Now: just go back if there's history, otherwise fall back to the correct login page.
   const handleBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
@@ -43,7 +39,7 @@ const POSAdminLogin: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col bg-base-100">
-      {/* Lean top bar — no full Navbar */}
+      {/* Lean top bar */}
       <div className="h-14 flex items-center justify-between px-6 border-b border-base-300">
         <button
           type="button"
@@ -51,7 +47,7 @@ const POSAdminLogin: React.FC = () => {
           className="btn btn-ghost btn-sm gap-2 font-bold"
         >
           <ArrowLeft size={16} />
-          Back
+          {t("auth.back")}
         </button>
         <span className="font-extrabold text-primary tracking-tighter">Simxel</span>
         <ToggleTheme />

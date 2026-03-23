@@ -1,4 +1,4 @@
-// src/components/Management/stats/StatsChart.tsx
+
 import React from "react";
 import {
   Bar,
@@ -57,7 +57,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ chartData, period }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-      {/* ── Line Chart ──────────────────────────────────────────────── */}
+      {/*  Line Chart  */}
       <div className="bg-base-200 border border-base-300 rounded-xl p-4 shadow-sm">
         <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-4">
           {t("dashboard.kpi.revenue")} — {periodLabel}
@@ -95,7 +95,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ chartData, period }) => {
         )}
       </div>
 
-      {/* ── Bar Chart ───────────────────────────────────────────────── */}
+      {/*  Bar Chart ─ */}
       <div className="bg-base-200 border border-base-300 rounded-xl p-4 shadow-sm">
         <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-4">
           {t("dashboard.chart")} — {periodLabel}

@@ -1,4 +1,4 @@
-// src/components/Management/stats/StatsTops.tsx
+
 import React from "react";
 import {
   Bar,

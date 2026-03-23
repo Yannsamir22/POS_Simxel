@@ -27,7 +27,7 @@ const PackageTicketItem = ({ item, employees }: { item: TicketItem; employees: E
             <select
               value={service.employeeId || ""}
               onChange={(e) => assignPackageEmployee(item.id, service.serviceId, e.target.value)}
-              className="select select-xs w-full"
+              className={`select select-xs w-full ${!item.employeeId ? "select-error border-error" : ""}`}
             >
               {/* fix: was hardcoded "Choose employee" */}
               <option value="">{t("pos.chooseEmployee")}</option>

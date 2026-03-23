@@ -6,8 +6,11 @@ import { useAuthStore } from "../../stores/authStore";
 import SyncIndicator from "../toggles/SyncIndicator";
 import ToggleLanguage from "../toggles/ToggleLanguage";
 import ToggleTheme from "../toggles/ToggleTheme";
-import logoLight from "../../assets/simxel_light.svg"
-import logoDark from "../../assets/simxel_dark.svg"
+
+// @ts-ignore
+import logoLight from "../../assets/simxel_light.svg";
+// @ts-ignore
+import logoDark from "../../assets/simxel_dark.svg";
 
 function useIsDark(): boolean {
   const [isDark, setIsDark] = useState(() => document.documentElement.getAttribute("data-theme") === "simxel-dark")

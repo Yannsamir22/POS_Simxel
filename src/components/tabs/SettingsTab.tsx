@@ -218,9 +218,9 @@ const [theme, setThemeState] = useState<ThemeChoice>(
     () => (localStorage.getItem("theme") as ThemeChoice) ?? "system",
   );
 
-  const handleTheme = (t: ThemeChoice) => {
-    setThemeState(t);
-    resolveAndApply(t);
+  const handleTheme = (choice: ThemeChoice) => {
+    setThemeState(choice);
+    resolveAndApply(choice);
   };
 
   // Theme card config 

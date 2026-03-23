@@ -20,10 +20,10 @@ const ExpenseManagement: React.FC = () => {
     loading,
   } = useExpenseStore();
 
-  const [formOpen, setFormOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<Expense | null>(null);
+  const [formOpen,     setFormOpen]     = useState(false);
+  const [editTarget,   setEditTarget]   = useState<Expense | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Expense | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deleting,     setDeleting]     = useState(false);
 
   useEffect(() => {
     fetchExpenses();
@@ -42,18 +42,36 @@ const ExpenseManagement: React.FC = () => {
     })
     .reduce((s, e) => s + e.amount, 0);
 
+  /** Unified submit handler — toasts here, not inside ExpenseForm */
   const handleSubmit = async (data: {
     type: string;
     amount: number;
     note?: string;
     date: string;
   }) => {
-    if (editTarget) return await editExpense(editTarget.id, data);
+    if (editTarget) {
+      const result = await editExpense(editTarget.id, data);
+      if (result.success) {
+        addToast(t("expenses.updated"), "success");
+        setFormOpen(false);
+        setEditTarget(null);
+      } else {
+        addToast(result.error ?? t("common.error"), "error");
+      }
+      return result;
+    }
 
-    return await addExpense(data);
+    const result = await addExpense(data);
+    if (result.success) {
+      addToast(t("expenses.added"), "success");
+      setFormOpen(false);
+    } else {
+      addToast(result.error ?? t("common.error"), "error");
+    }
+    return result;
   };
 
-    const handleDelete = async () => {
+  const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
     const result = await removeExpense(deleteTarget.id);
@@ -100,7 +118,7 @@ const ExpenseManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* JOURNAL TABLE */}
+      {/* TABLE */}
       <div className="bg-base-200 rounded-2xl shadow-2xl border-2 border-base-300 overflow-hidden">
         <div className="p-6 border-b border-base-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="border-l-4 border-error pl-6">
@@ -129,7 +147,7 @@ const ExpenseManagement: React.FC = () => {
                 <th className="py-4 pl-8">{t("common.date")}</th>
                 <th>{t("common.type")}</th>
                 <th>{t("common.note")}</th>
-                <th className="text-right"> {t("common.amount")}</th>
+                <th className="text-right">{t("common.amount")}</th>
                 <th className="text-right pr-6">{t("common.actions")}</th>
               </tr>
             </thead>
@@ -188,7 +206,7 @@ const ExpenseManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* MODAL */}
+      {/* Expense form modal */}
       <ExpenseForm
         open={formOpen}
         onClose={() => {
@@ -198,8 +216,8 @@ const ExpenseManagement: React.FC = () => {
         onSubmit={handleSubmit}
         initial={editTarget}
       />
-    
-     {/* Delete confirmation */}
+
+      {/* Delete confirmation */}
       {deleteTarget && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -209,9 +227,13 @@ const ExpenseManagement: React.FC = () => {
             className="bg-base-100 rounded-2xl shadow-2xl border border-base-300 w-full max-w-sm mx-4 p-6 flex flex-col items-center gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 rounded-full bg-error/10 text-error"><Trash2 size={28} /></div>
+            <div className="p-4 rounded-full bg-error/10 text-error">
+              <Trash2 size={28} />
+            </div>
             <div>
-              <p className="font-black text-base uppercase tracking-tight">{t("common.delete")}?</p>
+              <p className="font-black text-base uppercase tracking-tight">
+                {t("common.delete")}?
+              </p>
               <p className="text-sm text-base-content/60 mt-1">
                 <span className="font-bold text-base-content">
                   {String(t(`expenses.types.${deleteTarget.type}`, { defaultValue: deleteTarget.type } as any))}
@@ -220,11 +242,23 @@ const ExpenseManagement: React.FC = () => {
               </p>
             </div>
             <div className="flex gap-3 w-full">
-              <button onClick={() => setDeleteTarget(null)} disabled={deleting} className="btn btn-ghost flex-1 rounded-lg font-bold">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="btn btn-ghost flex-1 rounded-lg font-bold"
+              >
                 {t("common.cancel")}
               </button>
-              <button onClick={handleDelete} disabled={deleting} className="btn btn-error flex-1 rounded-lg font-bold">
-                {deleting ? <span className="loading loading-spinner loading-xs" /> : <><Trash2 size={14} /> {t("common.delete")}</>}
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="btn btn-error flex-1 rounded-lg font-bold"
+              >
+                {deleting ? (
+                  <span className="loading loading-spinner loading-xs" />
+                ) : (
+                  <><Trash2 size={14} /> {t("common.delete")}</>
+                )}
               </button>
             </div>
           </div>

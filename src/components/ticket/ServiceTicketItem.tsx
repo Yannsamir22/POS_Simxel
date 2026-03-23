@@ -20,7 +20,7 @@ const ServiceTicketItem = ({ item, employees }: { item: TicketItem; employees: E
       <select
         value={item.employeeId || ""}
         onChange={(e) => assignEmployee(item.id, e.target.value)}
-        className="select select-xs mt-2 w-full"
+        className={`select select-xs mt-2 w-full ${!item.employeeId ? "select-error border-error" : ""}`}
       >
         
         <option value="">{t("pos.chooseEmployee")}</option>

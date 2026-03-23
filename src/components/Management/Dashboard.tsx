@@ -1,4 +1,4 @@
-// src/components/Management/Dashboard.tsx
+
 import React, { useEffect, useState } from "react";
 import Loading from "../../loadash/Loading";
 import { SalesService } from "../../services/salesService";

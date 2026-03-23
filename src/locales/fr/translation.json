@@ -8,7 +8,8 @@
     "expenses": "Dépenses",
     "employees": "Employés",
     "settings": "Paramètres",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "menu": "Menu"
   },
 
   "common": {
@@ -33,7 +34,11 @@
     "status": "Statut",
     "total": "Total",
     "currency": "FCFA",
-    "ticket": "Ticket"
+    "ticket": "Ticket",
+    "deleteConfirmTitle": "Supprimer cet élément ?",
+    "deleteConfirmDesc": "Sera supprimé définitivement.",
+    "deleteError": "Échec de la suppression",
+    "retry": "Réessayer"
   },
 
   "auth": {
@@ -48,7 +53,8 @@
     "unlock": "Déverrouiller",
     "refusedAccess": "Accès refusé",
     "logoutManager": "Caissier déconnecté",
-    "logoutAdmin": "Administrateur déconnecté"
+    "logoutAdmin": "Administrateur déconnecté",
+    "back": "Retour"
   },
 
   "dashboard": {
@@ -131,7 +137,8 @@
     "addService": "Ajouter un service",
     "name": "Nom du service",
     "price": "Prix",
-    "noServices": "Aucun service"
+    "noServices": "Aucun service",
+    "noServicesAvailable": "Aucun service disponible"
   },
 
   "packages": {
@@ -151,6 +158,9 @@
     "thisMonth": "Ce mois",
     "noExpenses": "Aucune dépense enregistrée",
     "type": "Type de dépense",
+    "deleted": "Dépense supprimée",
+    "updated": "Dépense mise à jour",
+    "added": "Dépense ajoutée",
     "types": {
       "Rent": "Loyer",
       "Electricity": "Électricité",
@@ -195,6 +205,11 @@
     "application": "Application",
     "version": "Version",
     "mode": "Mode",
+    "primary": "Primaire",
+    "secondary": "Secondaire",
+    "tertiary": "Tertiaire",
+    "light": "Clair",
+    "dark": "Sombre",
     "themes": {
       "light": "Clair",
       "dark": "Sombre",
@@ -203,6 +218,11 @@
       "darkDesc": "Agréable pour les yeux",
       "systemDesc": "Suit votre appareil"
     }
+  },
+
+  "languages": {
+    "english": "English",
+    "french": "Français"
   },
 
   "ticket": {
@@ -219,6 +239,21 @@
     "newTicket": "Nouveau ticket"
   },
 
+  "receipt": {
+    "saleConfirmed": "Vente confirmée !",
+    "receiptGenerated": "Le reçu a été généré avec succès.",
+    "noReceipt": "Vente confirmée — aucun reçu généré.",
+    "openReceipt": "Ouvrir le reçu",
+    "print": "Imprimer",
+    "printDirect": "Impression directe (sans dialogue)",
+    "closeWithoutPrinting": "Fermer sans imprimer",
+    "opening": "Ouverture…",
+    "printing": "Impression…",
+    "printSent": "Reçu envoyé à l'imprimante",
+    "printError": "Impossible d'imprimer le reçu",
+    "openError": "Impossible d'ouvrir le reçu"
+  },
+
   "sync": {
     "online": "Synchronisé",
     "syncing": "Synchronisation…",
@@ -227,6 +262,7 @@
     "lastSync": "Dernière sync :",
     "clickToRetry": "Cliquer pour réessayer"
   },
+
   "pos": {
     "productSale": "Vente de produits",
     "serviceSale": "Vente de services",
@@ -236,6 +272,23 @@
     "searchPackages": "Rechercher des forfaits…",
     "noResults": "Aucun résultat",
     "chooseEmployee": "Choisir un employé",
-    "todayExpenses": "Aujourd'hui"
+    "todayExpenses": "Aujourd'hui",
+    "noProducts": "Aucun produit trouvé"
+  },
+
+  "files": {
+    "savedFiles": "Fichiers sauvegardés",
+    "refresh": "Actualiser",
+    "openFolder": "Ouvrir le dossier",
+    "receipts": "Reçus",
+    "exports": "Exports",
+    "open": "Ouvrir",
+    "print": "Imprimer",
+    "noReceipts": "Aucun reçu trouvé.",
+    "noExports": "Aucun export trouvé.",
+    "desktopOnly": "La gestion des fichiers est uniquement disponible sur l'application bureau.",
+    "printSuccess": "Reçu envoyé à l'imprimante",
+    "printError": "Échec de l'impression",
+    "openError": "Impossible d'ouvrir le fichier"
   }
 }

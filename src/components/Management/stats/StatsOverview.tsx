@@ -1,4 +1,4 @@
-// src/components/Management/stats/StatsOverview.tsx
+
 import { BarChart2, ShoppingCart, TrendingUp, Trophy } from "lucide-react";
 import React from "react";
 

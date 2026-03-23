@@ -1,4 +1,3 @@
-// src/components/Management/stats/NoSales.tsx
 import { Store } from "lucide-react";
 import React from "react";
 import { useT } from "../../../hooks/useT";

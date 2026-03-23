@@ -1,5 +1,14 @@
-// src/services/reportService.ts
 import { axiosInstance } from "../api/api";
+
+declare global {
+  interface Window {
+    electronAPI?: {
+      openFile: (
+        fileName: string,
+      ) => Promise<{ ok: boolean; error?: string; path?: string }>;
+    };
+  }
+}
 
 /**
  * Downloads a report as a blob, saves it via the backend (already done),
@@ -14,24 +23,25 @@ async function handleReportDownload(
   try {
     const res = await request;
 
-    // ── Get filename from Content-Disposition header ──────────────────────
+    //  Get filename from Content-Disposition header 
     const disposition: string = res.headers?.["content-disposition"] ?? "";
-    const match = disposition.match(/filename="?([^"]+)"?/);
-    const fileName = match?.[1] ?? fallbackFileName;
+    const match = disposition.match(/filename[^;=\n]*=(['"]?)([^'"\n]*)\1/);
+    const fileName = match?.[2]?.trim() ?? fallbackFileName;
 
-    // ── Electron: open the file that was already saved by the backend ─────
+    //  Electron: open the file that was already saved by the backend 
     if (window.electronAPI) {
-      // The backend saves the file to EXPORTS_DIR and we ask Electron to open it.
-      // We pass only the filename — the main process resolves the full path from EXPORTS_DIR.
       const result = await window.electronAPI.openFile(fileName);
       if (!result.ok) {
         // File not found in EXPORTS_DIR — fall back to browser download
+        console.warn(
+          `[ReportService] openFile("${fileName}") failed: ${result.error}. Falling back to download.`,
+        );
         triggerBrowserDownload(res.data, fileName);
       }
       return { ok: true };
     }
 
-    // ── Web fallback: trigger browser download ────────────────────────────
+    //  Web fallback: trigger browser download 
     triggerBrowserDownload(res.data, fileName);
     return { ok: true };
   } catch (err: any) {
@@ -41,6 +51,26 @@ async function handleReportDownload(
       "Failed to generate report";
     console.error("[ReportService]", error);
     return { ok: false, error };
+  }
+}
+
+
+/** Reads the actual error message even when the response is a Blob. */
+async function extractError(err: any, fallback: string): Promise<string> {
+  try {
+    const blob: Blob | undefined = err?.response?.data;
+    if (blob instanceof Blob) {
+      const text = await blob.text();
+      const json = JSON.parse(text);
+      return json?.error ?? json?.message ?? fallback;
+    }
+    return (
+      err?.response?.data?.error ??
+      err?.message ??
+      fallback
+    );
+  } catch {
+    return err?.message ?? fallback;
   }
 }
 
@@ -55,7 +85,7 @@ function triggerBrowserDownload(blob: Blob, fileName: string) {
   URL.revokeObjectURL(url);
 }
 
-// ── Shared config for all report requests ─────────────────────────────────────
+//  Shared config for all report requests ─
 const BLOB_CONFIG = {
   responseType: "blob" as const, // ← critical: tells axios not to parse as JSON
 };
@@ -70,7 +100,7 @@ export const ReportService = {
         params: { startDate, endDate },
         ...BLOB_CONFIG,
       }),
-      `Journal_Ventes_${startDate}.xlsx`,
+      `Journal_Ventes_${startDate}_to_${endDate}.xlsx`,
     ),
 
   /**
@@ -82,7 +112,7 @@ export const ReportService = {
         params: { startDate, endDate },
         ...BLOB_CONFIG,
       }),
-      `Rapport_Staff_${startDate}.xlsx`,
+      `Rapport_Staff_${startDate}_to_${endDate}.xlsx`,
     ),
 
   /**
@@ -103,7 +133,7 @@ export const ReportService = {
         params: { startDate, endDate },
         ...BLOB_CONFIG,
       }),
-      `Bilan_Financier_${startDate}.xlsx`,
+      `Bilan_Financier_${startDate}_to_${endDate}.xlsx`,
     ),
 
   /**

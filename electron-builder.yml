@@ -1,94 +1,113 @@
 # electron-builder.yml
-#
-# Full build configuration for Simxel desktop app.
-# Run:  npm run dist         → current platform
-#       npm run dist:win     → Windows NSIS installer
-#       npm run dist:mac     → macOS DMG
-#       npm run dist:linux   → Linux AppImage
 
 appId: com.simxel.pos
 productName: Simxel
 copyright: Copyright © 2026 Simxel
 
-# Directories
 directories:
-      output: release         # Built installers go here
-      buildResources: assets  #Icons, license, etc.
+  output: release
+  buildResources: assets
 
-# Files packed into the app
+# electron-vite outputs to out/ — not dist/ or dist-electron/
 files:
-      - dist/**               # Renderer (React build)
-      - dist-electron/**      # Main + preload
+  - out/main/**
+  - out/preload/**
+  - out/renderer/**
+  - package.json
 
-# Extra resources (backend)
-# The compiled Simxel backend is placed in resources/backend/
-# so the main process can spawn it with:  path.join(process.resourcesPath, 'backend', 'server.js')
 extraResources:
-      # Commpiled TypeScript output of the backend
-      - from: ../Simxel/dist
-        to: backend
-        filter:
-         - "**/*.js"
-         - "**/*.json"
-         - "!**/*.test.js"
+  # Bundled backend JS (dist/server.js)
+  - from: ../Simxel/dist
+    to: backend
+    filter:
+      - "**/*.js"
+      - "**/*.json"
+      - "!**/*.test.js"
 
-         #Prisma schema + migrations (needed by the backend at runtime)
-      - from: ../Simxel/prisma
-        to: backend/prisma
-        filter:
-        - "**/*"
+  # Prisma migrations
+  - from: ../Simxel/prisma
+    to: backend/prisma
+    filter:
+      - "**/*"
 
-      # ── Native / non-bundlable node_modules ──────────────────────────────────
-      # Only ship what can't be bundled by esbuild (native addons, prisma engine).
-      # To keep the installer small, bundle the rest with:
-      #   cd ../Simxel && npx esbuild src/server.ts \
-      #     --bundle --platform=node --target=node20 \
-      #     --outfile=dist/server.js \
-      #     --external:@prisma/client --external:bcrypt
-      - from: ../Simxel/node_modules/@prisma
-        to: backend/node_modules/@prisma
-      - from: ../Simxel/node_modules/.prisma
-        to: backend/node_modules/.prisma
-      - from: ../Simxel/node_modules/bcrypt
-        to: backend/node_modules/bcrypt
+  # Prisma client (generated native addon)
+  - from: ../Simxel/node_modules/@prisma
+    to: backend/node_modules/@prisma
 
-# Windows
+  - from: ../Simxel/node_modules/.prisma
+    to: backend/node_modules/.prisma
+
+  # pdfkit — kept external from esbuild bundle because it loads font metrics
+  # from disk at runtime (relative to its own package location).
+  # All pdfkit sub-dependencies are pure JS and must also be included.
+  - from: ../Simxel/node_modules/pdfkit
+    to: backend/node_modules/pdfkit
+
+  - from: ../Simxel/node_modules/fontkit
+    to: backend/node_modules/fontkit
+
+  - from: ../Simxel/node_modules/linebreak
+    to: backend/node_modules/linebreak
+
+  - from: ../Simxel/node_modules/png-js
+    to: backend/node_modules/png-js
+
+  - from: ../Simxel/node_modules/js-md5
+    to: backend/node_modules/js-md5
+
+  - from: ../Simxel/node_modules/@noble
+    to: backend/node_modules/@noble
+
+  # fontkit's own sub-dependencies
+  - from: ../Simxel/node_modules/restructure
+    to: backend/node_modules/restructure
+
+  - from: ../Simxel/node_modules/dfa
+    to: backend/node_modules/dfa
+
+  - from: ../Simxel/node_modules/unicode-properties
+    to: backend/node_modules/unicode-properties
+
+  - from: ../Simxel/node_modules/unicode-trie
+    to: backend/node_modules/unicode-trie
+
+  - from: ../Simxel/node_modules/tiny-inflate
+    to: backend/node_modules/tiny-inflate
+
+  - from: ../Simxel/node_modules/brotli
+    to: backend/node_modules/brotli
+
+
 win:
   target:
     - target: nsis
       arch:
         - x64
   icon: assets/simxel_logo.ico
-  # Signing (optional — needed for SmartScreen bypass)
-  # certificateFile: cert.pfx
-  # certificatePassword: ${CERT_PASSWORD}
- 
+
 nsis:
-  oneClick: false           # Let user choose install dir
+  oneClick: false
   allowToChangeInstallationDirectory: true
   installerIcon: assets/simxel_logo.ico
   uninstallerIcon: assets/simxel_logo.ico
   shortcutName: Simxel
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
 
-# macOS
 mac:
   target:
     - dmg
   icon: assets/icon.icns
   category: public.app-category.business
-  # notarize: true  # Requires Apple Developer account
 
-# Linux
 linux:
   target:
     - AppImage
   icon: assets/icon.png
   category: Office
 
-# Auto-updater publish configuration
-# Using GitHub Releases (myAcount):
 publish:
-      provider: github
-      owner: Yannsamir22
-      repo: simxel  # <- replace with name of repo 
-      private: false
+  provider: github
+  owner: Yannsamir22
+  repo: POS_Simxel
+  private: false

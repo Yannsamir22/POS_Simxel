@@ -7,7 +7,7 @@
  */
 import { contextBridge, ipcRenderer } from "electron";
 
-// ─── Type definitions (also exported for src/types) ───────────────────────────
+//  Type definitions (also exported for src/types)
 export interface FileInfo {
   name: string;
   path: string;
@@ -15,27 +15,34 @@ export interface FileInfo {
 }
 
 export interface ElectronAPI {
-  // ── Directories ──────────────────────────────────────────────────────────
+  //  Directories
   getReceiptsDir: () => Promise<string>;
   getExportsDir: () => Promise<string>;
   openReceiptsFolder: () => Promise<void>;
   openExportsFolder: () => Promise<void>;
 
-  // ── File operations ───────────────────────────────────────────────────────
+  //  File operations
   openFile: (filePath: string) => Promise<{ ok: boolean; error?: string }>;
   listReceipts: () => Promise<FileInfo[]>;
   listExports: () => Promise<FileInfo[]>;
 
-  // ── Printing ─────────────────────────────────────────────────────────────
+  //  Printing
   printReceipt: (
     filePath: string,
-    silent?: boolean
+    silent?: boolean,
   ) => Promise<{ ok: boolean; error?: string }>;
 
-  // ── App info ─────────────────────────────────────────────────────────────
+  //  App info
   getAppVersion: () => Promise<string>;
 
-  // ── Auto-updater ─────────────────────────────────────────────────────────
+  // Backedn port (needed for dynamic port resolution)
+  getBackendPort: () => Promise<number>;
+
+  // Cloud DB URL management
+  setCloudUrl: (url: string) => Promise<{ ok: boolean; error?: string }>;
+  getCloudUrl: () => Promise<string | null>;
+
+  //  Auto-updater
   onUpdateAvailable: (cb: (info: { version: string }) => void) => () => void;
   onUpdateDownloaded: (cb: (info: { version: string }) => void) => () => void;
   onUpdateProgress: (cb: (progress: { percent: number }) => void) => () => void;
@@ -43,10 +50,9 @@ export interface ElectronAPI {
   checkForUpdates: () => void;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers
 /**
  * Subscribe to an IPC event and return an unsubscribe function.
- * This pattern avoids listener leaks in React's useEffect.
  */
 function on<T>(channel: string, cb: (payload: T) => void): () => void {
   const listener = (_: Electron.IpcRendererEvent, payload: T) => cb(payload);
@@ -54,7 +60,7 @@ function on<T>(channel: string, cb: (payload: T) => void): () => void {
   return () => ipcRenderer.off(channel, listener);
 }
 
-// ─── Expose API ───────────────────────────────────────────────────────────────
+//  Expose API
 contextBridge.exposeInMainWorld("electronAPI", {
   // Directories
   getReceiptsDir: () => ipcRenderer.invoke("get-receipts-dir"),
@@ -73,6 +79,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // App info
   getAppVersion: () => ipcRenderer.invoke("get-app-version"),
+  getBackendPort: () => ipcRenderer.invoke("get-backend-port"),
+
+  // Cloud URL management
+  setCloudUrl: (url: string) => ipcRenderer.invoke("set-cloud-url", url),
+  getCloudUrl: () => ipcRenderer.invoke("get-cloud-url"),
 
   // Auto-updater — push events from main → renderer
   onUpdateAvailable: (cb) => on("update-available", cb),

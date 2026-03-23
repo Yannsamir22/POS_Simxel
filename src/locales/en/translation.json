@@ -8,7 +8,8 @@
     "expenses": "Expenses",
     "employees": "Employees",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "menu": "Menu"
   },
 
   "common": {
@@ -33,7 +34,11 @@
     "status": "Status",
     "total": "Total",
     "currency": "FCFA",
-    "ticket": "Ticket"
+    "ticket": "Ticket",
+    "deleteConfirmTitle": "Delete this item?",
+    "deleteConfirmDesc": "Will be permanently removed.",
+    "deleteError": "Failed to delete",
+    "retry": "Retry"
   },
 
   "auth": {
@@ -48,7 +53,8 @@
     "unlock": "Unlock",
     "refusedAccess": "Access Refused",
     "logoutManager": "Manager logged out",
-    "logoutAdmin": "Admin logged out"
+    "logoutAdmin": "Admin logged out",
+    "back": "Back"
   },
 
   "dashboard": {
@@ -131,7 +137,8 @@
     "addService": "Add Service",
     "name": "Service Name",
     "price": "Price",
-    "noServices": "No services yet"
+    "noServices": "No services yet",
+    "noServicesAvailable": "No services available"
   },
 
   "packages": {
@@ -151,6 +158,9 @@
     "thisMonth": "This Month",
     "noExpenses": "No expenses recorded",
     "type": "Expense Type",
+    "deleted": "Expense deleted",
+    "updated": "Expense updated",
+    "added": "Expense added",
     "types": {
       "Rent": "Rent",
       "Electricity": "Electricity",
@@ -195,6 +205,11 @@
     "application": "Application",
     "version": "Version",
     "mode": "Mode",
+    "primary": "Primary",
+    "secondary": "Secondary",
+    "tertiary": "Tertiary",
+    "light": "Light",
+    "dark": "Dark",
     "themes": {
       "light": "Light",
       "dark": "Dark",
@@ -203,6 +218,11 @@
       "darkDesc": "Easy on the eyes",
       "systemDesc": "Follows your device"
     }
+  },
+
+  "languages": {
+    "english": "English",
+    "french": "Français"
   },
 
   "ticket": {
@@ -219,6 +239,21 @@
     "newTicket": "New ticket"
   },
 
+  "receipt": {
+    "saleConfirmed": "Sale Confirmed!",
+    "receiptGenerated": "The receipt has been generated successfully.",
+    "noReceipt": "Sale confirmed — no receipt generated.",
+    "openReceipt": "Open Receipt",
+    "print": "Print",
+    "printDirect": "Direct print (no dialog)",
+    "closeWithoutPrinting": "Close without printing",
+    "opening": "Opening…",
+    "printing": "Printing…",
+    "printSent": "Receipt sent to printer",
+    "printError": "Could not print receipt",
+    "openError": "Could not open receipt"
+  },
+
   "sync": {
     "online": "Synced",
     "syncing": "Syncing…",
@@ -227,6 +262,7 @@
     "lastSync": "Last sync:",
     "clickToRetry": "Click to retry"
   },
+
   "pos": {
     "productSale": "Product Sale",
     "serviceSale": "Service Sale",
@@ -236,6 +272,23 @@
     "searchPackages": "Search packages…",
     "noResults": "No results",
     "chooseEmployee": "Choose employee",
-    "todayExpenses": "Today"
+    "todayExpenses": "Today",
+    "noProducts": "No products found"
+  },
+
+  "files": {
+    "savedFiles": "Saved Files",
+    "refresh": "Refresh",
+    "openFolder": "Open Folder",
+    "receipts": "Receipts",
+    "exports": "Exports",
+    "open": "Open",
+    "print": "Print",
+    "noReceipts": "No receipts found.",
+    "noExports": "No exports found.",
+    "desktopOnly": "File management is only available in the desktop app.",
+    "printSuccess": "Receipt sent to printer",
+    "printError": "Print failed",
+    "openError": "Could not open file"
   }
 }

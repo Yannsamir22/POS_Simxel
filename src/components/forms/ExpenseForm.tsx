@@ -1,9 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useT } from "../../hooks/useT";
-import { useToastStore } from "../../stores/toastStore";
 import type { Expense } from "../../stores/expenseStore";
-
 
 interface ExpenseFormProps {
   open: boolean;
@@ -17,10 +15,16 @@ interface ExpenseFormProps {
   }) => Promise<{ success: boolean; error?: string } | void>;
 }
 
-
 const EXPENSE_TYPE_KEYS = [
-  "Rent", "Electricity", "Water", "Supplies",
-  "Salary", "Transport", "Maintenance", "Marketing", "Other",
+  "Rent",
+  "Electricity",
+  "Water",
+  "Supplies",
+  "Salary",
+  "Transport",
+  "Maintenance",
+  "Marketing",
+  "Other",
 ] as const;
 
 const ExpenseForm: React.FC<ExpenseFormProps> = ({
@@ -30,19 +34,20 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
   initial,
 }) => {
   const { t } = useT();
-  const addToast = useToastStore((s: any) => s.addToast);
 
-  const [type,    setType]    = useState(initial?.type ?? "");
-  const [amount,  setAmount]  = useState<string>(initial?.amount?.toString() ?? "");
-  const [note,    setNote]    = useState(initial?.note ?? "");
-  const [date,    setDate]    = useState(
+  const [type, setType] = useState(initial?.type ?? "");
+  const [amount, setAmount] = useState<string>(
+    initial?.amount?.toString() ?? "",
+  );
+  const [note, setNote] = useState(initial?.note ?? "");
+  const [date, setDate] = useState(
     initial?.date
       ? new Date(initial.date).toISOString().slice(0, 10)
       : new Date().toISOString().slice(0, 10),
   );
   const [loading, setLoading] = useState(false);
 
-  const [error,   setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Reset when modal opens
   useEffect(() => {
@@ -66,9 +71,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     setError(null);
 
     const parsedAmount = parseFloat(amount);
-    if (!type.trim())                       return setError("Please select an expense type.");
-    if (isNaN(parsedAmount) || parsedAmount <= 0) return setError("Please enter a valid amount.");
-
+    if (!type.trim()) {
+      setError(t("expenses.type") + " " + t("common.error"));
+      return;
+    }
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      setError(t("common.amount") + " " + t("common.error"));
+      return;
+    }
     setLoading(true);
     try {
       const result = await onSubmit({
@@ -83,13 +93,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         return;
       }
 
-      addToast(
-        initial ? "Expense updated" : "Expense added",
-        "success",
-      );
       onClose();
     } catch (err: any) {
-      setError(err?.response?.data?.error ?? err?.message ?? "Failed to save expense.");
+      setError(
+        err?.response?.data?.error ?? err?.message ?? "Failed to save expense.",
+      );
     } finally {
       setLoading(false);
     }
@@ -130,7 +138,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
             <select
               className={`select select-bordered w-full ${error && !type ? "select-error" : ""}`}
               value={type}
-              onChange={(e) => { setType(e.target.value); setError(null); }}
+              onChange={(e) => {
+                setType(e.target.value);
+                setError(null);
+              }}
               required
             >
               <option value="">Select a type…</option>
@@ -155,7 +166,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               step={1}
               placeholder="e.g. 5000"
               value={amount}
-              onChange={(e) => { setAmount(e.target.value); setError(null); }}
+              onChange={(e) => {
+                setAmount(e.target.value);
+                setError(null);
+              }}
               className={`input input-bordered w-full font-black text-lg ${error && !amount ? "input-error" : ""}`}
               required
             />

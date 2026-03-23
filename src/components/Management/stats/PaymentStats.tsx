@@ -1,4 +1,4 @@
-// src/components/Management/stats/PaymentStats.tsx
+
 import React from "react";
 import {
   Bar,
@@ -69,7 +69,7 @@ const PaymentStats: React.FC<PaymentStatsProps> = ({ payments }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-      {/* ── Pie Chart ───────────────────────────────────────────────── */}
+      {/* Pie Chart  */}
       <div className="bg-base-200 border border-base-300 rounded-xl p-4 shadow-sm">
         <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-2">
           {t("dashboard.payments")}
@@ -113,7 +113,7 @@ const PaymentStats: React.FC<PaymentStatsProps> = ({ payments }) => {
         )}
       </div>
 
-      {/* ── Payment Bar Chart ───────────────────────────────────────── */}
+      {/* Payment Bar Chart ─ */}
       <div className="bg-base-200 border border-base-300 rounded-xl p-4 shadow-sm">
         <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-4">
           {t("dashboard.totalCollected")}

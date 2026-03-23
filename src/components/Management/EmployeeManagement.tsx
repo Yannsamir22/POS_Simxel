@@ -42,31 +42,43 @@ const EmployeeManagement = () => {
     setModalOpen(true);
   };
 
-   const handleCreate = async (data: any) => {
-    const result = await addEmployee(data);
-    if (result.success) addToast(t("employees.addEmployee") + " success");
-    return result;
-  };
-  const handleEdit = async (data: any) => {
-    const result = await editEmployee(target!.id, data);
-    if (result.success) addToast(t("common.save") + " success");
-    return result;
-  };
-  const handleDelete = async () => {
-    const result = await removeEmployee(target!.id);
-    if (result.success) addToast("Employee deleted successfully");
-    return result;
-  };
-
   const openDelete = (emp: Employee) => {
     setTarget(emp);
     setMode("delete");
     setModalOpen(true);
   };
-  if (loading)
-    return (
-     <Loading message={t("common.loading")}/>
-    );
+
+  const handleCreate = async (data: any) => {
+    const result = await addEmployee(data);
+    if (result.success) {
+      addToast(t("employees.added"), "success");
+    } else {
+      addToast(result.error ?? t("common.error"), "error");
+    }
+    return result;
+  };
+
+  const handleEdit = async (data: any) => {
+    const result = await editEmployee(target!.id, data);
+    if (result.success) {
+      addToast(t("employees.updated"), "success");
+    } else {
+      addToast(result.error ?? t("common.error"), "error");
+    }
+    return result;
+  };
+
+  const handleDelete = async () => {
+    const result = await removeEmployee(target!.id);
+    if (result.success) {
+      addToast(t("employees.deleted"), "success");
+    } else {
+      addToast(result.error ?? t("common.deleteError"), "error");
+    }
+    return result;
+  };
+
+  if (loading) return <Loading message={t("common.loading")} />;
 
   return (
     <div className="space-y-6">
@@ -77,7 +89,7 @@ const EmployeeManagement = () => {
             <h3 className="text-xl font-black uppercase tracking-tighter">
               {t("employees.title")}
             </h3>
-            <p className="text-[10px] font-bold text-base-content/50 uppercase tracking-[0.3em">
+            <p className="text-[10px] font-bold text-base-content/50 uppercase tracking-[0.3em]">
               {t("employees.subtitle")}
             </p>
           </div>
@@ -95,7 +107,7 @@ const EmployeeManagement = () => {
             <thead>
               <tr className="bg-base-300/50 border-b border-base-300">
                 <th className="text-[10px] uppercase tracking-widest opacity-50 pl-10">
-                  {t("employees.title")}{" "}
+                  {t("employees.title")}
                 </th>
                 <th className="text-right text-[10px] uppercase tracking-widest opacity-50 pr-6">
                   {t("employees.commission")}
@@ -127,8 +139,7 @@ const EmployeeManagement = () => {
                         <span className="font-bold text-sm uppercase tracking-tight">
                           {emp.name}
                         </span>
-
-                        <span className="text-[9px] opacity-40 font-bold u]ercase italic">
+                        <span className="text-[9px] opacity-40 font-bold uppercase italic">
                           {t("employees.dob")}:{" "}
                           {(emp.dateOfBirth &&
                             new Date(emp.dateOfBirth).toLocaleDateString()) ||
@@ -138,25 +149,29 @@ const EmployeeManagement = () => {
                     </td>
                     <td className="text-right pr-6 space-x-2">
                       {emp.commissionRate ? (
-                        <span className={`font-mono font-bold text-green-500 ${(emp.commissionRate ?? 0) > 0 ? "text-success" : "text-error"}`}>
+                        <span
+                          className={`font-mono font-bold ${
+                            (emp.commissionRate ?? 0) > 0
+                              ? "text-success"
+                              : "text-error"
+                          }`}
+                        >
                           {Math.round((emp.commissionRate ?? 0) * 100)}%
                         </span>
                       ) : (
-                        <span className="font-mono font-bold text-red-500">
-                          0%
-                        </span>
+                        <span className="font-mono font-bold text-error">0%</span>
                       )}
                     </td>
                     <td className="text-right pr-6 space-x-2">
                       <button
                         onClick={() => openEdit(emp)}
-                        className="btn btn-ghost btn-xs rounded-4xl p-1 hover:text-primary transition-colors"
+                        className="btn btn-ghost btn-xs rounded-full p-1 hover:text-primary transition-colors"
                       >
                         <Edit2 size={14} />
                       </button>
                       <button
                         onClick={() => openDelete(emp)}
-                        className="btn btn-ghost btn-xs rounded-4xl p-1 hover:text-error transition-colors"
+                        className="btn btn-ghost btn-xs rounded-full p-1 hover:text-error transition-colors"
                       >
                         <Trash2 size={14} />
                       </button>

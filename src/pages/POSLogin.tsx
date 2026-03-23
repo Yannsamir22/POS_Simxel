@@ -5,6 +5,7 @@ import Navbar from "../components/navigations/Navbar";
 import { useT } from "../hooks/useT";
 
 const POSLogin: React.FC = () => {
+  const {t} = useT();
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false)
@@ -31,7 +32,7 @@ const POSLogin: React.FC = () => {
     setSubmitting(false);
   };
   
-  const {t} = useT();
+  
   return (
     <div className="h-screen overflow-hidden flex flex-col w-full">
       <Navbar />

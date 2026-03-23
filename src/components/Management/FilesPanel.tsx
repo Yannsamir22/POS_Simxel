@@ -1,14 +1,3 @@
-/**
- * src/components/Management/FilesPanel.tsx
- *
- * Admin panel tab that lists saved receipts and Excel exports.
- * Users can:
- *   • Open any file in the default OS app
- *   • Print a receipt directly
- *   • Open the containing folder in Explorer / Finder
- *
- * Add this as a tab inside AdminPage / AdminSettings.
- */
 import {
   FileSpreadsheet,
   FileText,
@@ -19,6 +8,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useElectronFiles } from "../../hooks/useElectronFiles";
+import { useT } from "../../hooks/useT";
 import { useToastStore } from "../../stores/toastStore";
 
 interface FileInfo {
@@ -41,6 +31,7 @@ export default function FilesPanel() {
   } = useElectronFiles();
 
   const addToast = useToastStore((s: any) => s.addToast);
+  const { t } = useT();
 
   const [tab, setTab] = useState<Tab>("receipts");
   const [receipts, setReceipts] = useState<FileInfo[]>([]);
@@ -66,7 +57,7 @@ export default function FilesPanel() {
   if (!isElectron) {
     return (
       <div className="p-6 text-base-content/50 text-sm">
-        File management is only available in the desktop app.
+        {t("files.desktopOnly")}
       </div>
     );
   }
@@ -76,15 +67,15 @@ export default function FilesPanel() {
   const handleOpen = async (file: FileInfo) => {
     setActionId(file.name + "-open");
     const result = await openFile(file.path);
-    if (!result.ok) addToast(result.error ?? "Could not open file", "error");
+    if (!result.ok) addToast(t("files.openError"), "error");
     setActionId(null);
   };
 
   const handlePrint = async (file: FileInfo) => {
     setActionId(file.name + "-print");
     const result = await printReceipt(file.path, false);
-    if (!result.ok) addToast(result.error ?? "Print failed", "error");
-    else addToast("Receipt sent to printer", "success");
+    if (!result.ok) addToast(t("files.printError"), "error");
+    else addToast(t("files.printSuccess"), "success");
     setActionId(null);
   };
 
@@ -99,9 +90,9 @@ export default function FilesPanel() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold">Saved Files</h2>
+        <h2 className="text-lg font-bold">{t("files.savedFiles")}</h2>
 
         <div className="flex gap-2">
           <button
@@ -110,7 +101,7 @@ export default function FilesPanel() {
             disabled={loading}
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-            Refresh
+            {t("files.refresh")}
           </button>
 
           <button
@@ -120,12 +111,12 @@ export default function FilesPanel() {
             className="btn btn-ghost btn-sm gap-1.5"
           >
             <FolderOpen size={14} />
-            Open Folder
+            {t("files.openFolder")}
           </button>
         </div>
       </div>
 
-      {/* ── Tabs ────────────────────────────────────────────────────────────── */}
+      {/* Tabs */}
       <div role="tablist" className="tabs tabs-boxed w-fit">
         <button
           role="tab"
@@ -133,7 +124,7 @@ export default function FilesPanel() {
           onClick={() => setTab("receipts")}
         >
           <FileText size={14} />
-          Receipts
+          {t("files.receipts")}
           {receipts.length > 0 && (
             <span className="badge badge-xs badge-primary">
               {receipts.length}
@@ -147,7 +138,7 @@ export default function FilesPanel() {
           onClick={() => setTab("exports")}
         >
           <FileSpreadsheet size={14} />
-          Exports
+          {t("files.exports")}
           {exports.length > 0 && (
             <span className="badge badge-xs badge-secondary">
               {exports.length}
@@ -156,23 +147,23 @@ export default function FilesPanel() {
         </button>
       </div>
 
-      {/* ── File list ───────────────────────────────────────────────────────── */}
+      {/* File list */}
       {loading ? (
         <div className="flex justify-center py-12">
           <Loader2 size={28} className="animate-spin text-base-content/30" />
         </div>
       ) : files.length === 0 ? (
         <div className="py-12 text-center text-base-content/40 text-sm">
-          No {tab} found.
+          {tab === "receipts" ? t("files.noReceipts") : t("files.noExports")}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-box border border-base-300">
           <table className="table table-sm w-full">
             <thead>
               <tr>
-                <th>File</th>
-                <th>Date</th>
-                <th className="text-right">Actions</th>
+                <th>{t("common.name")}</th>
+                <th>{t("common.date")}</th>
+                <th className="text-right">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -182,48 +173,41 @@ export default function FilesPanel() {
 
                 return (
                   <tr key={file.path} className="hover">
-                    {/* File name */}
                     <td className="font-mono text-xs max-w-xs truncate">
                       {file.name}
                     </td>
-
-                    {/* Modified date */}
                     <td className="text-xs text-base-content/60 whitespace-nowrap">
                       {formatDate(file.mtime)}
                     </td>
-
-                    {/* Actions */}
                     <td>
                       <div className="flex justify-end gap-1">
-                        {/* Open in OS viewer */}
                         <button
                           onClick={() => handleOpen(file)}
                           disabled={!!actionId}
                           className="btn btn-ghost btn-xs gap-1"
-                          title="Open"
+                          title={t("files.open")}
                         >
                           {actionId === openKey ? (
                             <Loader2 size={12} className="animate-spin" />
                           ) : (
                             <FolderOpen size={12} />
                           )}
-                          Open
+                          {t("files.open")}
                         </button>
 
-                        {/* Print (receipts only) */}
                         {tab === "receipts" && (
                           <button
                             onClick={() => handlePrint(file)}
                             disabled={!!actionId}
                             className="btn btn-ghost btn-xs gap-1"
-                            title="Print"
+                            title={t("files.print")}
                           >
                             {actionId === printKey ? (
                               <Loader2 size={12} className="animate-spin" />
                             ) : (
                               <Printer size={12} />
                             )}
-                            Print
+                            {t("files.print")}
                           </button>
                         )}
                       </div>

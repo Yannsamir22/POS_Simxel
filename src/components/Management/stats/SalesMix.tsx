@@ -1,4 +1,3 @@
-// src/components/Management/stats/SalesMix.tsx
 import React from "react";
 import {
   Cell,
@@ -80,7 +79,7 @@ const SalesMix: React.FC<SalesMixProps> = ({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {/* ── Sales Mix Donut ─────────────────────────────────────────── */}
+      {/*  Sales Mix Donut  */}
       <div className="bg-base-200 border border-base-300 rounded-xl p-4 shadow-sm">
         <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-2">
           Sales Mix
@@ -131,7 +130,7 @@ const SalesMix: React.FC<SalesMixProps> = ({
         )}
       </div>
 
-      {/* ── Radial Bar ──────────────────────────────────────────────── */}
+      {/*  Radial Bar  */}
       <div className="bg-base-200 border border-base-300 rounded-xl p-4 shadow-sm">
         <p className="text-[10px] font-black uppercase tracking-widest opacity-50 mb-2">
           Category Breakdown
